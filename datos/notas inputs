@@ -1,0 +1,28 @@
+# Materias
+1. Nombre
+2. Cursos
+3. Horas
+4. Profesor
+
+# Profesores
+1. Materias
+2. Disponibilidad
+
+# Aulas
+1. Materias
+3. Capacidad
+
+# Grupos de Alumnos
+# Slots horarios
+
+# Restricciones "hard"
+1. Dos materias misma aula
+2. Exceder horas semana / profesor
+3. Dos materias a la vez mismo profesor
+4. Asignar todas las horas
+5. No comprometer disponibilidad profesor
+6. No superar capacidad de las aulas
+
+# Restricciones soft
+1. Dejar slots libres en el medio
+...
