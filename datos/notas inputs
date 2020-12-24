@@ -16,13 +16,17 @@
 # Slots horarios
 
 # Restricciones "hard"
-1. Dos materias misma aula
-2. Exceder horas semana / profesor
-3. Dos materias a la vez mismo profesor
-4. Asignar todas las horas
-5. No comprometer disponibilidad profesor
-6. No superar capacidad de las aulas
+1. No se pueden asignar horas a un profesor fuera de su disponibilidad
+2. No se pueden asignar dos asignaturas a la vez a la misma clase
+3. No se pueden asignar dos clases a la vez al mismo profesor
+4. Se deben asignar todas las asignaturas a cada clase
+5. Las asignaturas se deben asignar al profesor definido en los inputs (aunque haya otros profesores que impartan esa asignatura a otra clase)
+6. Las clases no pueden tener horas vacías entre medias (pero si pueden tener horas vacías al principio y al final de la jornada si el número de horas semanales de esa clase es inferior al número total de horas disponibles)
 
 # Restricciones soft
-1. Dejar slots libres en el medio
-...
+1. Los profesores deben tener el menor número de huecos posibles
+2. El número total de periodos vacíos se debe distribuir uniformemente entre los profesores
+3. El número de horas impartidas por un profesor deben distribuirse lo más uniformemente posible a lo largo de la semana
+4. El número de horas de una clase determinada debe repartirse lo más uniformemente posible (esto aplica en los casos en los que el número de horas semanales de la clase es inferior al número total de horas disponibles)
+5. Las clases no deben tener la misma asignatura más de una vez en el día
+
