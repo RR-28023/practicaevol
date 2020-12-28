@@ -29,6 +29,7 @@ def ejecutar_algoritmo(n_iter, tam_pop):
     #seleccionar_solución()
 
 def nueva_funcion():
+    x = 1
     pass
 
 
