@@ -1,4 +1,3 @@
-# This is a sample Python script.
 import pandas as pd
 from inputs import codificar_inputs
 
@@ -27,11 +26,6 @@ def ejecutar_algoritmo(n_iter, tam_pop):
     #    seleccionar_supervivientes()
     #
     #seleccionar_solución()
-
-def nueva_funcion():
-    x = 1
-    pass
-
 
 
 # Press the green button in the gutter to run the script.

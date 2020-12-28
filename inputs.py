@@ -40,16 +40,16 @@ def generar_HCA_PCA(clases_df, clases, asignaturas):
         for j, asignatura in enumerate(asignaturas):
             HCA[i].append(clases_df.loc[clases_df['id_clase'] == clase, 'horas_' + asignatura][i])
 
-
+    #TODO: Falta generar la mariz PCA
 
     return HCA, PCA
-
-def extraer_tuplas_profe_asignatura(clases_df):
-
-    asignaturas = [col.replace('horas_','') for col in clases_df.columns[1::2]]
-    tuplas = set()
-    for asignatura in asignaturas:
-        for profe in clases_df['profesor_' + asignatura].unique():
-            tuplas.add((asignatura,profe))
-
-    return tuplas
+#
+# def extraer_tuplas_profe_asignatura(clases_df):
+#
+#     asignaturas = [col.replace('horas_','') for col in clases_df.columns[1::2]]
+#     tuplas = set()
+#     for asignatura in asignaturas:
+#         for profe in clases_df['profesor_' + asignatura].unique():
+#             tuplas.add((asignatura,profe))
+#
+#     return tuplas
