@@ -1,0 +1,68 @@
+---
+title: "Entrega 2: Elaboración de horarios mediante algoritmos evolutivos"
+author: "Joan Pons y Ramon Rotaeche"
+date: "28/12/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+enunciado:
+a)Estableced cuáles son las restricciones soft y hard de vuestro algoritmo y justifi-cadlas.
+
+b)Explicad claramente cuál es la codificación usada, cuáles son los parámetros delalgoritmo y su función de fitness. Justificad su elección.
+
+c)Cread varias entradas con distintos grados de dificultad y analizad los resulta-dos obtenidos.Podéis utilizar como entrada listas de asignaturas y sus horassemanales de distintos cursos de secundaria y bachillerato.
+
+d)Proponed alguna modificación al algoritmo y analizad los resultados obtenidos.Esta modificación puede ser un nuevo operador de mutación o recombinación,una nueva estrategia de selección de los individuos de la nueva generaciónm, etc.
+
+
+### 2. Codificación empleada
+
+#### 2.1 Información de entrada
+[TBC: explicar archivo excel y las dataframes que se generan]
+
+- Se supone que todas las clases son de una hora, yq ue no hay recreos
+
+#### 2.2 Codificación de la información de entrada
+
+Con la información introducida a través del archivo excel, nuestro programa genera los siguientes elementos:
+
+* *clases* = *['Clase A', 'Clase B', ..., Clase m]*, es una lista de m elementos conteniendo el id de cada clase. Cuando en la notación nos referimos a una clase usando un número *x*, nos referimos a la clase que ocupa el lugar x-ésimo en esta lista.
+
+* *asignaturas* = *['Matemáticas', 'Lengua', ..., Asignatura n]*, es una lista de n elementos conteniendo el id de cada asignatura. Cuando en la notación nos referimos a una asignatura usando un número *x*, nos referimos a la clase que ocupa el lugar *x-ésimo* en esta lista.
+
+* *profesores* = *['Pepe', 'Pepa', ..., Profesor p]*, es una lista de p elementos conteniendo el id de cada profesor. Cuando en la notación nos referimos a un profesor usando un número *x*, nos referimos al profesor que ocupa el lugar *x-ésimo* en esta lista.
+
+* *franjas* = *['Lunes 9.00 - 10.00', Franja t]*, es una lista de t elementos con todas las franjas de una hora que componen el horario lectivo, ordenadas de forma que en primer lugar está la primera hora lectiva del lunes y en último lugar está la última hora del viernes. Cuando en la notación nos referimos a una franja usando un número *x*, nos referimos a la franja que ocupa el lugar *x-ésimo* en esta lista. Por ejemplo, si el horario es todos los días de la semana de 9.00 a 14.00, la franja horaria *5* corresponde al lunes de 13.00 a 14.00, mientras que la franja *6* corresponde al martes de 9.00 a 10.00.
+
+* *Horas_Clase_Asignatura~mxn~*, abreviado como **HCA~mxn~**, es una matriz donde el elemento *ij* es el número de horas asignadas a la clase *i* de la asignatura *j* (*HCA~ij~* valdrá 0 cuando la clase *i* no tenga asignada ninguna hora de la asignatura *j*)
+
+* *Profesor_Clase_Asignatura~mxn~*, abreviado como **PCA~mxn~**, es una matriz donde el elemento *ij* es el profesor que da la asignatura *j* a la clase *i*. Esto es necesario porque una misma asignatura (ej. Lengua) puede ser impartida por los diferentes profesores a diferentes clases (*PCA~ij~* valdrá 0 cuando la clase *i* no tenga asignada la asignatura *j*)
+
+* *Disponibilidad_Profesor_Franja~pxt~*, abreviado como **DPF~pxt~**, es una matriz donde el elemento *ij* representa la disponibilidad del profesor *i* en la franja *j*. Vale 1 si el profesor puee dar clase a esa hora o 0 si no puede.
+
+
+#### 2.3 Genotipo
+
+Para representar una posible solución usaremos la matriz **Genotipo~mxt~**, donde el elemento *ij* representa la asignatura asignada a la clase *i* en la franja *j*.
+
+Nótese que la solución no especifica qué profesor es asignado para dar una determinada asignatura a una determinada clase. Esto es porque vamos a diseñar el algoritmo de modo que al generar una posible solución, el profesor asignado a cada clase-asignatura sea el correcto. Al fin y al cabo esto es una condición *hard* que hay que cumplir, y permite simplificar la notación y reducir el tamaño del espacio de búsqueda. 
+
+
+
+
+
+
+
+$$
+\textit{Formula} = 
+  \sum_{\textit{i}=\textit{xxx}}^{\textit{yyy}}
+  \frac
+    {\textit{ZZZ}_{\textit{i}}}
+    {\textit{MMM}_{i}^
+      {\text{NN}_{\textit{i}}}
+    }
+$$
