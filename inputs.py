@@ -31,7 +31,6 @@ def generar_clases_asignaturas_profesores(clases_df, profes_df):
 
     return clases, asignaturas, profesores
 
-
 def generar_HCA_PCA(clases_df, clases, asignaturas):
 
     HCA = []
@@ -45,3 +44,12 @@ def generar_HCA_PCA(clases_df, clases, asignaturas):
 
     return HCA, PCA
 
+def extraer_tuplas_profe_asignatura(clases_df):
+
+    asignaturas = [col.replace('horas_','') for col in clases_df.columns[1::2]]
+    tuplas = set()
+    for asignatura in asignaturas:
+        for profe in clases_df['profesor_' + asignatura].unique():
+            tuplas.add((asignatura,profe))
+
+    return tuplas
