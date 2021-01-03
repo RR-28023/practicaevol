@@ -42,7 +42,7 @@ Con la información introducida a través del archivo excel, nuestro programa ge
 
 * *Profesor_Clase_Asignatura~mxn~*, abreviado como **PCA~mxn~**, es una matriz donde el elemento *ij* es el profesor que da la asignatura *j* a la clase *i*. Esto es necesario porque una misma asignatura (ej. Lengua) puede ser impartida por los diferentes profesores a diferentes clases (*PCA~ij~* valdrá 0 cuando la clase *i* no tenga asignada la asignatura *j*)
 
-* *Disponibilidad_Profesor_Franja~pxt~*, abreviado como **DPF~pxt~**, es una matriz donde el elemento *ij* representa la disponibilidad del profesor *i* en la franja *j*. Vale 1 si el profesor puee dar clase a esa hora o 0 si no puede.
+* *Disponibilidad_Profesor_Franja~pxt~*, abreviado como **DPF~pxt~**, es una matriz donde el elemento *ij* representa la disponibilidad del profesor *i* en la franja *j*. Vale 1 si el profesor puede dar clase a esa hora o 0 si no puede.
 
 
 #### 2.3 Genotipo
