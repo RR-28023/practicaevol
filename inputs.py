@@ -2,11 +2,23 @@ import pandas as pd
 
 
 def codificar_inputs():
+    inputs_codificados = {}
     clases_df, profes_df, horas_df = extraer_inputs()
     clases, asignaturas, profesores, franjas = \
         generar_clases_asignaturas_profesores_franjas(clases_df, profes_df, horas_df)
     HCA, PCA = generar_HCA_PCA(clases_df, clases, asignaturas, profesores)
     DPF = generar_DPF(profes_df, horas_df, franjas, profesores)
+
+    inputs_codificados['clases'] = clases
+    inputs_codificados['asignaturas'] = asignaturas
+    inputs_codificados['profesores'] = profesores
+    inputs_codificados['franjas'] = franjas
+    inputs_codificados['HCA'] = HCA
+    inputs_codificados['PCA'] = PCA
+    inputs_codificados['DPF'] = DPF
+
+
+    return inputs_codificados
 
 def extraer_inputs(filepath='.\\datos\\Generador inputs horarios.xlsx'):
     '''

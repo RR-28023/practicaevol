@@ -1,12 +1,16 @@
 import pandas as pd
+
 from inputs import codificar_inputs
+from genotipo import genotipo
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 
-def inicializar_población():
-    pass
+def inicializar_poblacion(inputs, tam_pop):
+    poblacion = [genotipo(inputs) for _ in range(tam_pop)]
+    return poblacion
+
 
 
 def ejecutar_algoritmo(n_iter, tam_pop):
@@ -15,8 +19,8 @@ def ejecutar_algoritmo(n_iter, tam_pop):
     :param n_iter: número de iteraciones
     :param tam_pop: tamaño de la población
     '''
-    codificar_inputs()
-    #inicializar_población()
+    inputs = codificar_inputs()
+    poblacion = inicializar_poblacion(inputs, tam_pop)
     #for i in range(n_iter + 1):
     #    for ind in range(tam_pop + 1):
     #        calcular_fit() # Calculamos el valor de fitness para cada individuo
