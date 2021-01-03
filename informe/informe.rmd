@@ -1,6 +1,6 @@
 ---
 title: "Entrega 2: Elaboración de horarios mediante algoritmos evolutivos"
-author: "Joan Pons y Ramon Rotaeche"
+author: "Juan Miguel Frau y Ramon Rotaeche"
 date: "28/12/2020"
 output: pdf_document
 ---
