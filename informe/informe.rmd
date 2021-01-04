@@ -19,14 +19,14 @@ c)Cread varias entradas con distintos grados de dificultad y analizad los result
 d)Proponed alguna modificación al algoritmo y analizad los resultados obtenidos.Esta modificación puede ser un nuevo operador de mutación o recombinación,una nueva estrategia de selección de los individuos de la nueva generaciónm, etc.
 
 
-### 2. Codificación empleada
+## 2. Codificación empleada
 
-#### 2.1 Información de entrada
+### 2.1 Información de entrada
 [TBC: explicar archivo excel y las dataframes que se generan]
 
 - Se supone que todas las clases son de una hora, yq ue no hay recreos
 
-#### 2.2 Codificación de la información de entrada
+### 2.2 Codificación de la información de entrada
 
 Con la información introducida a través del archivo excel, nuestro programa genera los siguientes elementos:
 
@@ -42,15 +42,51 @@ Con la información introducida a través del archivo excel, nuestro programa ge
 
 * *Profesor_Clase_Asignatura~mxn~*, abreviado como **PCA~mxn~**, es una matriz donde el elemento *ij* es el profesor que da la asignatura *j* a la clase *i*. Esto es necesario porque una misma asignatura (ej. Lengua) puede ser impartida por los diferentes profesores a diferentes clases (*PCA~ij~* valdrá 0 cuando la clase *i* no tenga asignada la asignatura *j*)
 
-* *Disponibilidad_Profesor_Franja~pxt~*, abreviado como **DPF~pxt~**, es una matriz donde el elemento *ij* representa la disponibilidad del profesor *i* en la franja *j*. Vale 1 si el profesor puee dar clase a esa hora o 0 si no puede.
+* *Disponibilidad_Profesor_Franja~pxt~*, abreviado como **DPF~pxt~**, es una matriz donde el elemento *ij* representa la disponibilidad del profesor *i* en la franja *j*. Vale 1 si el profesor puede dar clase a esa hora o 0 si no puede.
 
 
-#### 2.3 Genotipo
+### 2.3 Genotipo
 
 Para representar una posible solución usaremos la matriz **Genotipo~mxt~**, donde el elemento *ij* representa la asignatura asignada a la clase *i* en la franja *j*.
 
 Nótese que la solución no especifica qué profesor es asignado para dar una determinada asignatura a una determinada clase. Esto es porque vamos a diseñar el algoritmo de modo que al generar una posible solución, el profesor asignado a cada clase-asignatura sea el correcto. Al fin y al cabo esto es una condición *hard* que hay que cumplir, y permite simplificar la notación y reducir el tamaño del espacio de búsqueda. 
 
+## 3. Algoritmo
+
+El algoritmo se estructura de la siguiente manera [COMPLETAR cuando lo tengamos]
+
+```
+def ejecutar_algoritmo(n_iter, tam_pop):
+    '''
+    Función principal para ejecutar todos los pasos e iteraciones del algoritmo evolutivo. No devuelve ningún objeto.
+    :param n_iter: número de iteraciones
+    :param tam_pop: tamaño de la población
+    '''
+    inputs = codificar_inputs()
+    poblacion = inicializar_poblacion(inputs, tam_pop)
+    #for i in range(n_iter + 1):
+    #    for ind in range(tam_pop + 1):
+    #        calcular_fit() # Calculamos el valor de fitness para cada individuo
+    #
+    #    seleccionar_padres()
+    #    recombinar_mutar()
+    #    seleccionar_supervivientes()
+    #
+    #seleccionar_solución()
+```
+
+## 3.1 Inicialización de los genotipos
+
+El procedimiento que empleamos para inicializar un genotipo de forma aleatoria es:
+
+Mientras quede alguna hora de alguna asignatura por asignar a una clase:
+  Para cada clase *i*:
+    Para cada asignatura j:
+      Si el número de horas pendientes de asignar a la clase *i* de la asignatura *j* es > 0:
+        1. Escoger un número de franja al azar entre las franjas disponibles para la clase *i*.
+        2. Asignar la asignatura *j* a esa franja horaria
+        3. Eliminar la franja seleccionada de la lista de franjas disponibles para la clase *i*.
+        4. Restar 1 al número de horas pendientes de asignar a la clase *i* de la asignatura *j*.
 
 
 

@@ -2,10 +2,23 @@ import pandas as pd
 
 
 def codificar_inputs():
+    inputs_codificados = {}
     clases_df, profes_df, horas_df = extraer_inputs()
-    clases, asignaturas, profesores, franjas = generar_clases_asignaturas_profesores_franjas(clases_df, profes_df, horas_df)
+    clases, asignaturas, profesores, franjas = \
+        generar_clases_asignaturas_profesores_franjas(clases_df, profes_df, horas_df)
     HCA, PCA = generar_HCA_PCA(clases_df, clases, asignaturas, profesores)
-    DPF = generar_DPF(profes_df, franjas, profesores)
+    DPF = generar_DPF(profes_df, horas_df, franjas, profesores)
+
+    inputs_codificados['clases'] = clases
+    inputs_codificados['asignaturas'] = asignaturas
+    inputs_codificados['profesores'] = profesores
+    inputs_codificados['franjas'] = franjas
+    inputs_codificados['HCA'] = HCA
+    inputs_codificados['PCA'] = PCA
+    inputs_codificados['DPF'] = DPF
+
+
+    return inputs_codificados
 
 def extraer_inputs(filepath='.\\datos\\Generador inputs horarios.xlsx'):
     '''
@@ -52,7 +65,7 @@ def generar_HCA_PCA(clases_df, clases, asignaturas, profesores):
     return HCA, PCA
 
 
-def generar_DPF(profes_df, franjas, profesores):
+def generar_DPF(profes_df, horas_df, franjas, profesores):
     DPF = []
 
     for i, profesor in enumerate(profesores):
@@ -62,12 +75,15 @@ def generar_DPF(profes_df, franjas, profesores):
 
     disponibilidad_df = profes_df.iloc[:, 1:]
 
+    horas_acum = 0
     for j in range(disponibilidad_df.shape[1]):
+        horas_j = (horas_df.iloc[1,j] - horas_df.iloc[0,j]) # Horas lectivas en el día j
         for i in range(disponibilidad_df.shape[0]):
             value = disponibilidad_df.iloc[i, j]
             if value != 0:
-                DPF[(value-1)][(j*6+i)] = 0
+                DPF[i][horas_acum:horas_acum + horas_j] = [0]*horas_j
 
+        horas_acum += horas_j
     return DPF
 #
 # def extraer_tuplas_profe_asignatura(clases_df):

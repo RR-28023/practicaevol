@@ -1,13 +1,22 @@
 import pandas as pd
+import operator
+
 from inputs import codificar_inputs
+from genotipo import genotipo
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 
-def inicializar_población():
-    pass
+def inicializar_poblacion(inputs, tam_pop):
+    poblacion = [genotipo(inputs) for _ in range(tam_pop)]
+    return poblacion
 
+def seleccionar_supervivientes(poblacion):
+    '''
+    #TODO: tendremos que escribir esta función, por ahora es para ilustrar como ordenaríamos los genotipos por fitness
+    '''
+    poblacion_ordenada = sorted(poblacion, key=operator.attrgetter('fitness'), reverse=True)
 
 def ejecutar_algoritmo(n_iter, tam_pop):
     '''
@@ -15,15 +24,14 @@ def ejecutar_algoritmo(n_iter, tam_pop):
     :param n_iter: número de iteraciones
     :param tam_pop: tamaño de la población
     '''
-    codificar_inputs()
-    #inicializar_población()
-    #for i in range(n_iter + 1):
-    #    for ind in range(tam_pop + 1):
-    #        calcular_fit() # Calculamos el valor de fitness para cada individuo
-    #
-    #    seleccionar_padres()
-    #    recombinar_mutar()
-    #    seleccionar_supervivientes()
+    inputs = codificar_inputs()
+    poblacion = inicializar_poblacion(inputs, tam_pop)
+    for i in range(n_iter + 1):
+        # seleccionar_padres()
+        # recombinar_padres()
+        # seleccionar_ind_a_mutar()
+        # mutar_individuos()
+        seleccionar_supervivientes(poblacion)
     #
     #seleccionar_solución()
 
@@ -32,7 +40,7 @@ def ejecutar_algoritmo(n_iter, tam_pop):
 if __name__ == '__main__':
     #ejecutar_algoritmo(100, 30)
 
-    ejecutar_algoritmo(100, 30)
+    ejecutar_algoritmo(100, 10)
     pass
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
