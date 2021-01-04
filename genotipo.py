@@ -10,7 +10,7 @@ class genotipo():
         self.inputs = inputs
         self.cod = self.generar_genotipo()
         # self.plot_genotipo()
-        self.fitness = self.calcular_fitness()
+        self.fitness = self.calcular_fitness() #TODO: hay que escribir está función, y una vez escrita el fitness será un atributo de cada genotipo que se calcula al inicializar el genotipo
 
     def generar_genotipo(self):
         '''
