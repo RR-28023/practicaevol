@@ -36,7 +36,7 @@ def ejecutar_algoritmo(n_iter, tam_pop):
 if __name__ == '__main__':
     #ejecutar_algoritmo(100, 30)
 
-    ejecutar_algoritmo(100, 30)
+    ejecutar_algoritmo(100, 10)
     pass
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

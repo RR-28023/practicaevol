@@ -1,4 +1,7 @@
 import random
+import copy
+import matplotlib.pyplot as plt
+import matplotlib.colors
 
 class genotipo():
 
@@ -6,6 +9,7 @@ class genotipo():
 
         self.inputs = inputs
         self.cod = self.generar_genotipo()
+        # self.plot_genotipo()
         self.fitness = self.calcular_fitness()
 
     def generar_genotipo(self):
@@ -18,7 +22,7 @@ class genotipo():
         n_franjas = len(self.inputs['franjas']) # numero horas lectivas
         cod = [[0]*n_franjas for _ in range(n_clases)] # Inicializamos matriz del genotipo
         f_disp_clases = [[i for i in range(n_franjas)] for _ in range(n_clases)] # Franjas que quedan sin asignar a cada clase
-        HCA_disp = self.inputs['HCA'] # Se usa para ir restando horas a medida que se asignan
+        HCA_disp = copy.deepcopy(self.inputs['HCA']) # Se usa para ir restando horas a medida que se asignan
         h_pend_clases = [sum(horas) for horas in HCA_disp]
         while sum(h_pend_clases) > 0:
             for clase in range(n_clases):
@@ -39,7 +43,37 @@ class genotipo():
         # TODO: completar
         pass
 
+    def plot_genotipo(self):
+        dias = ['L', 'M', 'X', 'J', 'V']
+        n_clases = len(self.inputs['clases'])
+        fig = plt.figure(figsize=(25, 13))
+        colors = plt.cm.tab20.colors
 
+        for c in range(1,n_clases + 1):
+            ax = fig.add_subplot(round(n_clases/2.0), round(n_clases/2.0), c)
+            ax.yaxis.grid()
+            ax.set_xlim(0.5, len(dias) + 0.5)
+            ax.set_ylim(14.1, 7.9)
+            ax.set_xticks(range(1, len(dias) + 1))
+            ax.set_xticklabels(dias)
+            ax.set_ylabel('Hora')
+            clase_label = self.inputs['clases'][c - 1]
+            horas_acum = 0
+            for ndia in range(len(dias)):
+                horas_en_dia = sum(dias[ndia] in f for f in self.inputs['franjas'])
+                asignaturas_en_dia = self.cod[c - 1][horas_acum:horas_en_dia + horas_acum]
+                for franja, asign in enumerate(asignaturas_en_dia):
+                    if asign != 0:
+                        ax.fill_between([ndia + 0.5, ndia + 1.46], [franja + 8, franja + 8], [franja + 9, franja + 9],
+                                         color=colors[asign], edgecolor='k',linewidth=0.5)
+                        asign_label = self.inputs['asignaturas'][asign - 1]
+                        ax.text(ndia + 1.00, franja + 8.5, asign_label, ha='center', va='center', fontsize=12)
+
+                horas_acum += horas_en_dia
+
+            plt.title(clase_label)#, y=1.15)
+
+        fig.show()
 
 def mutar_genotipo(genotipo_a_mutar: genotipo):
     genotipo_mutado = genotipo_a_mutar
