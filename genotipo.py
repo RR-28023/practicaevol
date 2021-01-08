@@ -1,6 +1,7 @@
 import random
 import copy
 import matplotlib.pyplot as plt
+import numpy as np
 import matplotlib.colors
 
 class genotipo():
@@ -9,8 +10,8 @@ class genotipo():
 
         self.inputs = inputs
         self.cod = self.generar_genotipo()
-        # self.plot_genotipo()
-        self.fitness = self.calcular_fitness() #TODO: hay que escribir está función, y una vez escrita el fitness será un atributo de cada genotipo que se calcula al inicializar el genotipo
+        #self.plot_genotipo()
+        self.fitness = self.calcular_fitness()
 
     def generar_genotipo(self):
         '''
@@ -36,12 +37,29 @@ class genotipo():
         return cod
 
     def calcular_fitness(self):
-        '''
-        Calcular fitness del genotipo
-        :return:
-        '''
-        # TODO: completar
-        pass
+        dias = ['L', 'M', 'X', 'J', 'V']
+        contador_hard = 0
+        contador_soft = 0
+
+        for i,clase in enumerate(self.inputs['clases']):
+            for j,franja in enumerate(self.inputs['franjas']):
+                asign = self.cod[i][j] -1
+                if asign != -1:
+                    profesor_asign = self.inputs['PCA'][i][asign]
+                    if self.inputs['DPF'][profesor_asign][j] == 0: contador_hard += 1 # restriccion hard 1
+                    profesores_otras_clases = [self.inputs['PCA'][c][self.cod[c][j]-1] for c,clase in enumerate(self.inputs['clases']) if c != i]
+                    if profesor_asign in profesores_otras_clases: contador_hard += 1 # restriccion hard 3
+
+        for ndia in range(len(dias)):
+            horas_en_dia = sum(dias[ndia] in f for f in self.inputs['franjas'])
+            clases_dia = self.cod[i][ndia*6:(ndia*6)+horas_en_dia]
+            if 0 in clases_dia[1:-1]: contador_hard += 1  # restriccion hard 6
+            if len(clases_dia) != len(set(clases_dia)):  contador_soft += 1 # restriccion soft 5
+
+        peso_rhard = 10
+        peso_rsoft = 1
+        fitness = peso_rhard*contador_hard + peso_rsoft*contador_soft
+        return fitness
 
     def plot_genotipo(self):
         dias = ['L', 'M', 'X', 'J', 'V']
