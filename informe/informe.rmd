@@ -1,10 +1,8 @@
 ---
-title: 'Entrega 2: Elaboración de horarios mediante algoritmos evolutivos'
+title: "Entrega 2: Elaboración de horarios mediante algoritmos evolutivos"
 author: "Juan Miguel Frau y Ramon Rotaeche"
 date: "28/12/2020"
-output:
-  html_document:
-    df_print: paged
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -58,7 +56,9 @@ Nótese que la solución no especifica qué profesor es asignado para dar una de
 
 ### 2.4 Función de fitness
 
-La función de fitness implementada comprobará si las restricciones hard y soft mencionadas anteriormente se cumplen o no. Para ello, estarán disponibles dos contadores, uno para las restricciones hard y otro para las soft, donde cada violación de una restricción su respectivo contador se verá incrementado. El coste del individuo será la suma de ambos contadores, sin embargo, dichos contadores serán multiplicados por unos pesos para poder simular que las restricciones hard tienen una importancia superior que las soft.
+La función de fitness implementada comprobará si las restricciones hard y soft mencionadas anteriormente se cumplen o no. Para ello, estarán disponibles dos contadores, uno para las restricciones hard y otro para las soft, donde en cada violación de una restricción su respectivo contador se verá incrementado. El coste del individuo será la suma de ambos contadores, sin embargo, dichos contadores serán multiplicados por unos pesos para poder simular que las restricciones hard tienen una importancia superior que las soft.
+
+Dicho esto, cuantas más restricciones infrinja, más grande será su valor de fitness, por lo que nos interesará encontrar el individuo con un valor de fitness mínimo, es decir, que será el que menos restricciones infringe.
 
 
 ## 3. Restricciones
@@ -104,15 +104,13 @@ def ejecutar_algoritmo(n_iter, tam_pop):
     '''
     inputs = codificar_inputs()
     poblacion = inicializar_poblacion(inputs, tam_pop)
-    #for i in range(n_iter + 1):
-    #    for ind in range(tam_pop + 1):
-    #        calcular_fit() # Calculamos el valor de fitness para cada individuo
-    #
-    #    seleccionar_padres()
-    #    recombinar_mutar()
-    #    seleccionar_supervivientes()
-    #
-    #seleccionar_solución()
+    for i in range(n_iter):
+        padres = seleccionar_padres(poblacion, tam_pop)
+        recombinar_padres()
+        mutar_individuos()
+        poblacion = seleccionar_supervivientes(poblacion, tam_pop)
+    solucion = seleccionar_solucion(poblacion)
+    solucion.plot_genotipo()
 ```
 
 ### 4.1 Inicialización de los genotipos
@@ -131,12 +129,38 @@ Mientras quede alguna hora de alguna asignatura por asignar a una clase:
 
 ## 4.2 Función de fitness
 
-La función de fitness implementada comprobará si las restricciones hard y soft mencionadas anteriormente se cumplen o no. Para ello, estarán disponibles dos contadores, uno para las restricciones hard y otro para las soft, donde cada violación de una restricción su respectivo contador se verá incrementado. El coste del individuo será la suma de ambos contadores, sin embargo, dichos contadores serán multiplicados por unos pesos para poder simular que las restricciones hard tienen una importancia superior que las soft.
+A continuación, se puede observar el código implementado para el cálculo del valor de fitness de un individuo donde se recorre todo la matriz que conforma el genotipo buscando las restricciones establecidas. Así pues, las restricciones anteriormente mencionadas que serán evaluadas en la función de fitness serán:
 
-Las restricciones anteriormente mencionadas que serán evaluadas en la función de fitness serán:
 * Restricciones hard 1, 3 y 6.
 * Restricciones soft 1, 2, 3, 4 y 5.
 
+```
+Insertar código
+```
+
+## 4.3 Selección de padres
+
+Para realizar la selección de padres se ha llevado a cabo el método de selección por torneo. Para ello, se han desordenado los individuos para añadir aletoriedad a la selección y se han formado *n* grupos formados por *k* individuos. De cada grupo, se ha seleccionado como padre el individuo que tiene menor valor de fitness.
+
+
+```
+Insertar código
+```
+
+## 4.4 Recombinación
+
+
+## 4.5 Mutación
+
+
+## 4.6 Selección de supervivientes
+
+Para realizar la selección de supervivientes en la población de individuos se ha utilizado el método de la ruleta.
+El método de la ruleta consiste en dotar a cada individuo de una probabilidad proporcional a su valor de fitness donde el indiviuo con mejor valor de fitness, que será el individuo que tenga el valor mínimo, tendrá más probabilidades de ser elegido. Una vez establecidas las probabilidades se realizarán *n* tiradas a la ruleta, donde *n* será el tamaño de la población estimada al inicio, y se obtendrán los supervivientes elegidos de forma aleatoria.
+
+```
+Insertar código
+```
 
 
 $$

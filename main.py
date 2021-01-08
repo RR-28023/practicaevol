@@ -56,7 +56,7 @@ def ejecutar_algoritmo(n_iter, tam_pop):
     '''
     inputs = codificar_inputs()
     poblacion = inicializar_poblacion(inputs, tam_pop)
-    for i in range(n_iter + 1):
+    for i in range(n_iter):
         padres = seleccionar_padres(poblacion, tam_pop)
         # recombinar_padres()
         # mutar_individuos()
@@ -68,7 +68,7 @@ def ejecutar_algoritmo(n_iter, tam_pop):
 if __name__ == '__main__':
     #ejecutar_algoritmo(100, 30)
 
-    ejecutar_algoritmo(0, 10)
+    ejecutar_algoritmo(100, 10)
     pass
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
