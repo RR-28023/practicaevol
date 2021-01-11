@@ -31,7 +31,7 @@ def seleccionar_supervivientes(poblacion, tam_pop):
 
 def seleccionar_padres(poblacion,tam_pop, num_padres):
     '''
-    Selección de los padres mediante torneo
+    Selección de los padres mediante el método del torneo
     '''
     poblacion_desordenada = random.sample(poblacion, tam_pop)
 
