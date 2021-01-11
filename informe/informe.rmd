@@ -87,9 +87,9 @@ Las restricciones "soft" del algoritmo son las siguientes:
 
 1. El número de horas impartidas por un profesor deben distribuirse lo más uniformemente posible a lo largo de la semana.
 
-1. El número de horas de una clase determinada debe repartirse lo más uniformemente posible (esto aplica en los casos en los que el número de horas semanales de la clase es inferior al número total de horas disponibles).
-
 1. Las clases no deben tener la misma asignatura más de una vez en el día.
+
+1. El número de horas de una clase determinada debe repartirse lo más uniformemente posible (esto aplica en los casos en los que el número de horas semanales de la clase es inferior al número total de horas disponibles).
 
 ## 4. Algoritmo
 
@@ -148,6 +148,10 @@ Insertar código
 ```
 
 ### 4.4 Recombinación
+
+Para realizar la recombinación, se toman dos individuos (*Padre 1* y *Padre 2*) y, siendo *n* el número total de clases, se seleccionan aleatoriamente *n/2* clases del *Padre 1* (*n/2 - 0.5* si *n* es impar) y las *n/2* clases complementarias del *Padre 2* (*n/2 + 0.5* si *n* es impar) combinándolas en un nuevo individuo, el *Hijo 1*. Por otro lado, las clases no seleccionadas de *Padre 1* y *Padre 2* se combinan para generar otro individuo adicional, el *Hijo 2*.
+
+Por ejemplo, si hay cuatro clases ('Clase A', 'Clase B', Clase C' y 'Clase D'). Una combinación posible sería formar el *Hijo 1* con la 'Clase A' y la 'Clase D' del *Padre 1*, y la 'Clase B' y la 'Clase C' del *Padre 2*. Mientras que el *Hijo 2* estaría formado por la 'Clase B' y la 'Clase C' del *Padre 1*, y la Clase A' y la 'Clase D' del *Padre 2*. 
 
 
 ### 4.5 Mutación

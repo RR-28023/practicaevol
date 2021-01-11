@@ -23,7 +23,7 @@ def seleccionar_supervivientes(poblacion, tam_pop):
     peor_valor_fitness = poblacion_ordenada[len(poblacion_ordenada)-1].fitness + 1
     pesos = [(peor_valor_fitness - i.fitness) for i in poblacion]
     total_valores = sum(pesos)
-    pesos = np.array(pesos) / total_valores
+    pesos = (np.array(pesos) / total_valores)
     supervivientes = np.random.choice(poblacion, tam_pop, p=pesos, replace=False)
     supervivientes = supervivientes.tolist()
     fitness_mejor_superviviente = sorted(supervivientes, key=operator.attrgetter('fitness'), reverse=False)[0].fitness
@@ -89,6 +89,8 @@ def ejecutar_algoritmo(n_iter, tam_pop):
         poblacion, fit_mejor_sup = seleccionar_supervivientes(poblacion, tam_pop)
         print("Fitness mejor superviviente en iteración {0}: {1}".format(i + 1,fit_mejor_sup))
         mejores_fit.append(fit_mejor_sup)
+        if i == 290:
+            pass
     solucion = seleccionar_solucion(poblacion)
     plot_fitness_iteraciones(mejores_fit)
     solucion.plot_genotipo()
@@ -97,7 +99,7 @@ def ejecutar_algoritmo(n_iter, tam_pop):
 if __name__ == '__main__':
     #ejecutar_algoritmo(100, 30)
 
-    ejecutar_algoritmo(500, 100)
+    ejecutar_algoritmo(n_iter=100, tam_pop=100)
     pass
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
