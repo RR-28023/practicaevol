@@ -94,8 +94,15 @@ class genotipo():
         fig.show()
 
 def mutar_genotipo(genotipo_a_mutar: genotipo):
+    n, m = np.shape(genotipo_a_mutar.cod)
+    posn = random.randint(0, n-1)
+    pos1m = random.randint(0, m-1)
+    pos2m = random.randint(0, m-1)
     genotipo_mutado = genotipo_a_mutar
-    # TODO: completar
+    value = genotipo_mutado.cod[posn][pos1m]
+    genotipo_mutado.cod[posn][pos1m] = genotipo_mutado.cod[posn][pos2m]
+    genotipo_mutado.cod[posn][pos2m] = value
+    genotipo_mutado.fitness = genotipo_mutado.calcular_fitness()
     return genotipo_mutado
 
 def combinar_genotipo(padre1: genotipo, padre2: genotipo):

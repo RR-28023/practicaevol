@@ -5,6 +5,7 @@ import numpy as np
 
 from inputs import codificar_inputs
 from genotipo import genotipo
+from genotipo import mutar_genotipo
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
@@ -28,21 +29,26 @@ def seleccionar_supervivientes(poblacion, tam_pop):
     return supervivientes
 
 
-def seleccionar_padres(poblacion,tam_pop):
+def seleccionar_padres(poblacion,tam_pop, num_padres):
     '''
     Selección de los padres mediante torneo
     '''
-    n_padres = int(tam_pop / 5) #Se seleccionarán una quinta parte de la población
     poblacion_desordenada = random.sample(poblacion, tam_pop)
 
-    k = int(tam_pop/n_padres) #número de individuos en cada grupo de torneo
+    k = int(tam_pop/num_padres) #número de individuos en cada grupo de torneo
     padres_seleccionados = []
-    for t in range(n_padres):
+    for t in range(num_padres):
         torneo = poblacion_desordenada[t*k:t*k+k]
         torneo = sorted(torneo, key=operator.attrgetter('fitness'), reverse=False)
         padres_seleccionados.append(torneo[0])
 
     return padres_seleccionados
+
+def mutar_individuos(poblacion, padres):
+    nueva_poblacion = poblacion
+    for padre in padres:
+        nueva_poblacion.append(mutar_genotipo(padre))
+    return nueva_poblacion
 
 def seleccionar_solucion(poblacion):
     poblacion_ordenada = sorted(poblacion, key=operator.attrgetter('fitness'), reverse=False)
@@ -54,12 +60,13 @@ def ejecutar_algoritmo(n_iter, tam_pop):
     :param n_iter: número de iteraciones
     :param tam_pop: tamaño de la población
     '''
+    num_padres = int(tam_pop / 5) #Se seleccionarán una quinta parte de la población
     inputs = codificar_inputs()
     poblacion = inicializar_poblacion(inputs, tam_pop)
     for i in range(n_iter):
-        padres = seleccionar_padres(poblacion, tam_pop)
+        padres = seleccionar_padres(poblacion, tam_pop, num_padres)
         # recombinar_padres()
-        # mutar_individuos()
+        poblacion = mutar_individuos(poblacion, padres)
         poblacion = seleccionar_supervivientes(poblacion, tam_pop)
     solucion = seleccionar_solucion(poblacion)
     solucion.plot_genotipo()

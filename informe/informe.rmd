@@ -1,5 +1,5 @@
 ---
-title: "Entrega 2: Elaboración de horarios mediante algoritmos evolutivos"
+title: 'Entrega 2: Elaboración de horarios mediante algoritmos evolutivos'
 author: "Juan Miguel Frau y Ramon Rotaeche"
 date: "28/12/2020"
 output: pdf_document
@@ -127,7 +127,7 @@ Mientras quede alguna hora de alguna asignatura por asignar a una clase:
         4. Restar 1 al número de horas pendientes de asignar a la clase *i* de la asignatura *j*.
 
 
-## 4.2 Función de fitness
+### 4.2 Función de fitness
 
 A continuación, se puede observar el código implementado para el cálculo del valor de fitness de un individuo donde se recorre todo la matriz que conforma el genotipo buscando las restricciones establecidas. Así pues, las restricciones anteriormente mencionadas que serán evaluadas en la función de fitness serán:
 
@@ -138,7 +138,7 @@ A continuación, se puede observar el código implementado para el cálculo del 
 Insertar código
 ```
 
-## 4.3 Selección de padres
+### 4.3 Selección de padres
 
 Para realizar la selección de padres se ha llevado a cabo el método de selección por torneo. Para ello, se han desordenado los individuos para añadir aletoriedad a la selección y se han formado *n* grupos formados por *k* individuos. De cada grupo, se ha seleccionado como padre el individuo que tiene menor valor de fitness.
 
@@ -147,13 +147,19 @@ Para realizar la selección de padres se ha llevado a cabo el método de selecci
 Insertar código
 ```
 
-## 4.4 Recombinación
+### 4.4 Recombinación
 
 
-## 4.5 Mutación
+### 4.5 Mutación
+
+La mutación consistirá en permutar dos franjas horarias del horario. Sin embargo, debido a las restricciones realizadas y la codificación inicial especificada, no será posible permutar a nivel de genotipo, sino que se realizará en una de las clases para evitar que una clase tenga una asignatura que no le pertenece. Por ello, en primer lugar, se obtendrá una clase de forma aleatoria y, seguidamente, se elegirán dos franjas del horario de dicha clase de forma aleatoria y se intercambiarán la posición.
 
 
-## 4.6 Selección de supervivientes
+```
+Insertar código
+```
+
+### 4.6 Selección de supervivientes
 
 Para realizar la selección de supervivientes en la población de individuos se ha utilizado el método de la ruleta.
 El método de la ruleta consiste en dotar a cada individuo de una probabilidad proporcional a su valor de fitness donde el indiviuo con mejor valor de fitness, que será el individuo que tenga el valor mínimo, tendrá más probabilidades de ser elegido. Una vez establecidas las probabilidades se realizarán *n* tiradas a la ruleta, donde *n* será el tamaño de la población estimada al inicio, y se obtendrán los supervivientes elegidos de forma aleatoria.
