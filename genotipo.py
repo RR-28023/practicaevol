@@ -61,7 +61,9 @@ class genotipo():
             for ndia in range(len(dias)):
                 horas_en_dia = sum(dias[ndia] in f for f in self.inputs['franjas'])
                 clases_dia = self.cod[i][horas_acum:horas_acum+horas_en_dia]
-                if 0 in clases_dia[1:-1]: contador_hard += 1  # restriccion hard 6
+                idx_primera_clase = next(i for i, asignatura in enumerate(clases_dia) if asignatura != 0)
+                idx_ultima_clase = next(i for i, asignatura in reversed(list(enumerate(clases_dia))) if asignatura != 0)
+                if 0 in clases_dia[idx_primera_clase:idx_ultima_clase]: contador_hard += 1  # restriccion hard 6
                 if len(clases_dia) != len(set(clases_dia)):  contador_soft += 1 # restriccion soft 5
                 horas_acum += horas_en_dia
 
