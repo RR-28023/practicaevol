@@ -1,5 +1,5 @@
 ---
-title: "Entrega 2: Elaboración de horarios mediante algoritmos evolutivos"
+title: 'Entrega 2: Elaboración de horarios mediante algoritmos evolutivos'
 author: "Juan Miguel Frau y Ramon Rotaeche"
 date: "28/12/2020"
 output: pdf_document
@@ -9,14 +9,17 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-enunciado:
-a)Estableced cuáles son las restricciones soft y hard de vuestro algoritmo y justifi-cadlas.
+## 1.Enunciado
 
-b)Explicad claramente cuál es la codificación usada, cuáles son los parámetros delalgoritmo y su función de fitness. Justificad su elección.
+El objetivo de esta entrega es implementar un algoritmo evolutivo para la elaboración de  horarios  en  un  centro  educativo. Para ello:
 
-c)Cread varias entradas con distintos grados de dificultad y analizad los resulta-dos obtenidos.Podéis utilizar como entrada listas de asignaturas y sus horassemanales de distintos cursos de secundaria y bachillerato.
+a) Estableced cuáles son las restricciones soft y hard de vuestro algoritmo y justificadlas.
 
-d)Proponed alguna modificación al algoritmo y analizad los resultados obtenidos.Esta modificación puede ser un nuevo operador de mutación o recombinación,una nueva estrategia de selección de los individuos de la nueva generaciónm, etc.
+b) Explicad claramente cuál es la codificación usada, cuáles son los parámetros del algoritmo y su función de fitness. Justificad su elección.
+
+c) Cread varias entradas con distintos grados de dificultad y analizad los resultados obtenidos.Podéis utilizar como entrada listas de asignaturas y sus horas semanales de distintos cursos de secundaria y bachillerato.
+
+d) Proponed alguna modificación al algoritmo y analizad los resultados obtenidos. Esta modificación puede ser un nuevo operador de mutación o recombinación,una nueva estrategia de selección de los individuos de la nueva generaciónm, etc.
 
 
 ## 2. Codificación empleada
@@ -51,7 +54,44 @@ Para representar una posible solución usaremos la matriz **Genotipo~mxt~**, don
 
 Nótese que la solución no especifica qué profesor es asignado para dar una determinada asignatura a una determinada clase. Esto es porque vamos a diseñar el algoritmo de modo que al generar una posible solución, el profesor asignado a cada clase-asignatura sea el correcto. Al fin y al cabo esto es una condición *hard* que hay que cumplir, y permite simplificar la notación y reducir el tamaño del espacio de búsqueda. 
 
-## 3. Algoritmo
+### 2.4 Función de fitness
+
+La función de fitness implementada comprobará si las restricciones hard y soft mencionadas anteriormente se cumplen o no. Para ello, estarán disponibles dos contadores, uno para las restricciones hard y otro para las soft, donde en cada violación de una restricción su respectivo contador se verá incrementado. El coste del individuo será la suma de ambos contadores, sin embargo, dichos contadores serán multiplicados por unos pesos para poder simular que las restricciones hard tienen una importancia superior que las soft.
+
+Dicho esto, cuantas más restricciones infrinja, más grande será su valor de fitness, por lo que nos interesará encontrar el individuo con un valor de fitness mínimo, es decir, que será el que menos restricciones infringe.
+
+
+## 3. Restricciones
+
+Las restricciones "hard" del algoritmo son las siguientes:
+
+1. No se pueden asignar horas a un profesor fuera de su disponibilidad. Por motivos de conciliación laboral esta restricción debe estar presente y se comprobará comparando con un horario que ha estimado cada profesor. Estos horarios de disponibilidad se encuentran en los inputs tal como se ha visto anteriormente.
+
+1. No se pueden asignar dos asignaturas a la vez a la misma clase. Esta restricción vendrá implícita en la codificación de los individuos ya que en cada franja únicamente se asigna una única asignatura, por lo que no será necesario que se tenga en cuenta para ser evaluada.
+
+1. No se pueden asignar dos clases a la vez al mismo profesor. Esta restricción se deberá tener en cuenta en la evaluación de cada individuo.
+
+1. Se deben asignar todas las horas de las asignaturas a cada clase. Esta restricción no es necesario que se tenga en cuenta para ser evaluada debido a que esta se cumple a la hora de crear cada uno de los genotipos.
+
+1. Las asignaturas se deben asignar al profesor definido en los inputs aunque haya otros profesores que impartan esa asignatura a otra clase. Esta restricción, tal como se ha explicado anteiormente, vendá implícita en la codificación del genotipo gracias a la matriz *Profesor_Clase_Asignatura~mxn~* implementada.
+
+1. Las clases no pueden tener horas vacías entre medias pero si pueden tener horas vacías al principio y al final de la jornada si el número de horas semanales de esa clase es inferior al número total de horas disponibles.
+
+1. Únicamente se podrá dar clase dentro del horario establecido. Esta restricción se satisfacerá ya que en la codificación de los individuos ya vienen establacidas dichas franjas horarias, por lo que únicamente se podrán asignar horas de asignaturas dentro de las franjas establecidas.
+
+Las restricciones "soft" del algoritmo son las siguientes:
+
+1. Los profesores deben tener el menor número de huecos posibles.
+
+1. El número total de periodos vacíos se debe distribuir uniformemente entre los profesores.
+
+1. El número de horas impartidas por un profesor deben distribuirse lo más uniformemente posible a lo largo de la semana.
+
+1. El número de horas de una clase determinada debe repartirse lo más uniformemente posible (esto aplica en los casos en los que el número de horas semanales de la clase es inferior al número total de horas disponibles).
+
+1. Las clases no deben tener la misma asignatura más de una vez en el día.
+
+## 4. Algoritmo
 
 El algoritmo se estructura de la siguiente manera [COMPLETAR cuando lo tengamos]
 
@@ -64,18 +104,16 @@ def ejecutar_algoritmo(n_iter, tam_pop):
     '''
     inputs = codificar_inputs()
     poblacion = inicializar_poblacion(inputs, tam_pop)
-    #for i in range(n_iter + 1):
-    #    for ind in range(tam_pop + 1):
-    #        calcular_fit() # Calculamos el valor de fitness para cada individuo
-    #
-    #    seleccionar_padres()
-    #    recombinar_mutar()
-    #    seleccionar_supervivientes()
-    #
-    #seleccionar_solución()
+    for i in range(n_iter):
+        padres = seleccionar_padres(poblacion, tam_pop)
+        recombinar_padres()
+        mutar_individuos()
+        poblacion = seleccionar_supervivientes(poblacion, tam_pop)
+    solucion = seleccionar_solucion(poblacion)
+    solucion.plot_genotipo()
 ```
 
-## 3.1 Inicialización de los genotipos
+### 4.1 Inicialización de los genotipos
 
 El procedimiento que empleamos para inicializar un genotipo de forma aleatoria es:
 
@@ -89,8 +127,46 @@ Mientras quede alguna hora de alguna asignatura por asignar a una clase:
         4. Restar 1 al número de horas pendientes de asignar a la clase *i* de la asignatura *j*.
 
 
+### 4.2 Función de fitness
+
+A continuación, se puede observar el código implementado para el cálculo del valor de fitness de un individuo donde se recorre todo la matriz que conforma el genotipo buscando las restricciones establecidas. Así pues, las restricciones anteriormente mencionadas que serán evaluadas en la función de fitness serán:
+
+* Restricciones hard 1, 3 y 6.
+* Restricciones soft 1, 2, 3, 4 y 5.
+
+```
+Insertar código
+```
+
+### 4.3 Selección de padres
+
+Para realizar la selección de padres se ha llevado a cabo el método de selección por torneo. Para ello, se han desordenado los individuos para añadir aletoriedad a la selección y se han formado *n* grupos formados por *k* individuos. De cada grupo, se ha seleccionado como padre el individuo que tiene menor valor de fitness.
 
 
+```
+Insertar código
+```
+
+### 4.4 Recombinación
+
+
+### 4.5 Mutación
+
+La mutación consistirá en permutar dos franjas horarias del horario. Sin embargo, debido a las restricciones realizadas y la codificación inicial especificada, no será posible permutar a nivel de genotipo, sino que se realizará en una de las clases para evitar que una clase tenga una asignatura que no le pertenece. Por ello, en primer lugar, se obtendrá una clase de forma aleatoria y, seguidamente, se elegirán dos franjas del horario de dicha clase de forma aleatoria y se intercambiarán la posición.
+
+
+```
+Insertar código
+```
+
+### 4.6 Selección de supervivientes
+
+Para realizar la selección de supervivientes en la población de individuos se ha utilizado el método de la ruleta.
+El método de la ruleta consiste en dotar a cada individuo de una probabilidad proporcional a su valor de fitness donde el indiviuo con mejor valor de fitness, que será el individuo que tenga el valor mínimo, tendrá más probabilidades de ser elegido. Una vez establecidas las probabilidades se realizarán *n* tiradas a la ruleta, donde *n* será el tamaño de la población estimada al inicio, y se obtendrán los supervivientes elegidos de forma aleatoria.
+
+```
+Insertar código
+```
 
 
 $$
