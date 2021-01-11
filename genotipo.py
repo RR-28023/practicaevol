@@ -2,7 +2,6 @@ import random
 import copy
 import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib.colors
 
 class genotipo():
 
@@ -106,14 +105,23 @@ def mutar_genotipo(genotipo_a_mutar: genotipo):
     posn = random.randint(0, n-1)
     pos1m = random.randint(0, m-1)
     pos2m = random.randint(0, m-1)
-    genotipo_mutado = genotipo_a_mutar
+    genotipo_mutado = copy.deepcopy(genotipo_a_mutar)
     value = genotipo_mutado.cod[posn][pos1m]
     genotipo_mutado.cod[posn][pos1m] = genotipo_mutado.cod[posn][pos2m]
     genotipo_mutado.cod[posn][pos2m] = value
     genotipo_mutado.fitness = genotipo_mutado.calcular_fitness()
     return genotipo_mutado
 
-def combinar_genotipo(padre1: genotipo, padre2: genotipo):
-    hijo = padre1 + padre2
-    # TODO: completar
-    return hijo
+def recombinar_genotipos(padre1: genotipo, padre2: genotipo):
+    n_clases = len(padre1.cod)
+    clases_idx = [i for i in range(n_clases)]
+    mitad = int(n_clases/2)
+    clases_a_cambiar_idx = random.sample(clases_idx, mitad)
+    hijo1, hijo2 = copy.deepcopy(padre1), copy.deepcopy(padre2)
+
+    for clase in clases_a_cambiar_idx:
+        hijo1.cod[clase] = padre2.cod[clase]
+        hijo2.cod[clase] = padre1.cod[clase]
+
+
+    return hijo1, hijo2
