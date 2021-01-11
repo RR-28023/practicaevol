@@ -41,14 +41,22 @@ class genotipo():
         contador_hard = 0
         contador_soft = 0
 
-        for i,clase in enumerate(self.inputs['clases']):
-            for j,franja in enumerate(self.inputs['franjas']):
+        for i, clase in enumerate(self.inputs['clases']):
+            for j, franja in enumerate(self.inputs['franjas']):
                 asign = self.cod[i][j] -1
                 if asign != -1:
+                    # restriccion hard 1
                     profesor_asign = self.inputs['PCA'][i][asign]
-                    if self.inputs['DPF'][profesor_asign][j] == 0: contador_hard += 1 # restriccion hard 1
-                    profesores_otras_clases = [self.inputs['PCA'][c][self.cod[c][j]-1] for c,clase in enumerate(self.inputs['clases']) if c != i]
-                    if profesor_asign in profesores_otras_clases: contador_hard += 1 # restriccion hard 3
+                    if self.inputs['DPF'][profesor_asign - 1][j] == 0:
+                        contador_hard += 1
+
+                    # restriccion hard 3
+                    profesores_otras_clases = []
+                    for c, clase in enumerate(self.inputs['clases']):
+                        if c != i and self.cod[c][j] != 0:
+                            profesores_otras_clases.append(self.inputs['PCA'][c][self.cod[c][j]-1])
+                    if profesor_asign in profesores_otras_clases:
+                        contador_hard += 1
 
         for ndia in range(len(dias)):
             horas_en_dia = sum(dias[ndia] in f for f in self.inputs['franjas'])

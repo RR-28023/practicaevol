@@ -4,8 +4,7 @@ import random
 import numpy as np
 
 from inputs import codificar_inputs
-from genotipo import genotipo
-from genotipo import mutar_genotipo
+from genotipo import genotipo, mutar_genotipo
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.

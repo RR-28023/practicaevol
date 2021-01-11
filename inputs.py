@@ -60,7 +60,7 @@ def generar_HCA_PCA(clases_df, clases, asignaturas, profesores):
     for i, clase in enumerate(clases):
         PCA.append([])
         for j, asignatura in enumerate(asignaturas):
-            PCA[i].append(profesores.index(clases_df.loc[clases_df['id_clase'] == clase, 'profesor_' + asignatura][i]))
+            PCA[i].append(profesores.index(clases_df.loc[clases_df['id_clase'] == clase, 'profesor_' + asignatura][i]) + 1)
 
     return HCA, PCA
 
@@ -68,9 +68,9 @@ def generar_HCA_PCA(clases_df, clases, asignaturas, profesores):
 def generar_DPF(profes_df, horas_df, franjas, profesores):
     DPF = []
 
-    for i, profesor in enumerate(profesores):
+    for i, _ in enumerate(profesores):
         DPF.append([])
-        for j, franja in enumerate(franjas):
+        for _ in franjas:
             DPF[i].append(1)
 
     disponibilidad_df = profes_df.iloc[:, 1:]
