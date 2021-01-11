@@ -58,11 +58,11 @@ class genotipo():
                     if profesor_asign in profesores_otras_clases:
                         contador_hard += 1
 
-        for ndia in range(len(dias)):
-            horas_en_dia = sum(dias[ndia] in f for f in self.inputs['franjas'])
-            clases_dia = self.cod[i][ndia*6:(ndia*6)+horas_en_dia]
-            if 0 in clases_dia[1:-1]: contador_hard += 1  # restriccion hard 6
-            if len(clases_dia) != len(set(clases_dia)):  contador_soft += 1 # restriccion soft 5
+            for ndia in range(len(dias)):
+                horas_en_dia = sum(dias[ndia] in f for f in self.inputs['franjas'])
+                clases_dia = self.cod[i][ndia*6:(ndia*6)+horas_en_dia]
+                if 0 in clases_dia[1:-1]: contador_hard += 1  # restriccion hard 6
+                if len(clases_dia) != len(set(clases_dia)):  contador_soft += 1 # restriccion soft 5
 
         peso_rhard = 10
         peso_rsoft = 1
