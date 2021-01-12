@@ -2,7 +2,6 @@ import random
 import copy
 import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib.colors
 
 class genotipo():
 
@@ -10,7 +9,7 @@ class genotipo():
 
         self.inputs = inputs
         self.cod = self.generar_genotipo()
-        #self.plot_genotipo()
+        self.apf = self.generar_horario_profesores() # Matriz AsignaturaProfesorFranja
         self.fitness = self.calcular_fitness()
 
     def generar_genotipo(self):
@@ -36,7 +35,29 @@ class genotipo():
             h_pend_clases = [sum(horas) for horas in HCA_disp] # Horas que quedan por asignar a cada clase
         return cod
 
+    def generar_horario_profesores(self):
+        '''
+        Genera la matriz AsignaturaProfesorFranja, en la que el elemento ij representa la asignatura asignada al
+        profesor i en la franja j. Si no hay asignatura asignada, ij valdrá 0. Si hay más de una asignatura asignada, ij
+        valdrá -1. Esta matriz no añade información adicional y se deduce enteramente de self.cod, pero se crea por
+        conveniencia para simplificar ciertos cálculos.
+        :return:
+        '''
+        n_franjas = len(self.inputs['franjas'])
+        apf = [[0]*n_franjas for _ in self.inputs['profesores']]
+        for clase, franjas in enumerate(self.cod):
+            for franja, asignatura in enumerate(franjas):
+                profe = self.inputs['PCA'][clase][asignatura - 1]
+                apf[profe - 1][franja] = asignatura if apf[profe - 1][franja] == 0 else -1
+
+        return apf
+
+
+
     def calcular_fitness(self):
+
+        self.apr = self.generar_horario_profesores() # Necesario si el genotipo se ha copiado en lugar de inicializarse.
+
         dias = ['L', 'M', 'X', 'J', 'V']
         contador_hard = 0
         contador_soft = 0
@@ -45,24 +66,44 @@ class genotipo():
             for j, franja in enumerate(self.inputs['franjas']):
                 asign = self.cod[i][j] -1
                 if asign != -1:
-                    # restriccion hard 1
+                    # restriccion hard 1 (disp. profesor)
                     profesor_asign = self.inputs['PCA'][i][asign]
                     if self.inputs['DPF'][profesor_asign - 1][j] == 0:
                         contador_hard += 1
 
-                    # restriccion hard 3
+                    # restriccion hard 3 (dos asignaturas a la vez mismo profesor)
                     profesores_otras_clases = []
-                    for c, clase in enumerate(self.inputs['clases']):
+                    for c, _ in enumerate(self.inputs['clases']):
                         if c != i and self.cod[c][j] != 0:
                             profesores_otras_clases.append(self.inputs['PCA'][c][self.cod[c][j]-1])
                     if profesor_asign in profesores_otras_clases:
                         contador_hard += 1
 
+            horas_acum = 0
             for ndia in range(len(dias)):
                 horas_en_dia = sum(dias[ndia] in f for f in self.inputs['franjas'])
-                clases_dia = self.cod[i][ndia*6:(ndia*6)+horas_en_dia]
-                if 0 in clases_dia[1:-1]: contador_hard += 1  # restriccion hard 6
-                if len(clases_dia) != len(set(clases_dia)):  contador_soft += 1 # restriccion soft 5
+                asig_dia = self.cod[i][horas_acum:horas_acum+horas_en_dia]
+
+                # restriccion hard 6 (huecos entre medias para las clases)
+                i_primera_asign = next((i for i, asig in enumerate(asig_dia) if asig != 0),0)
+                i_ultima_asign = next((i for i, asig in reversed(list(enumerate(asig_dia))) if asig != 0),len(asig_dia))
+                huecos = asig_dia[i_primera_asign:i_ultima_asign + 1].count(0)
+                contador_hard += 1*huecos
+
+                # restriccion soft 5 (misma asignatura en el día) - Penaliza más si hay más asignaturas repes
+                n_repeticiones = len(asig_dia) - len(set(asig_dia) -{0}) - asig_dia.count(0)
+                if n_repeticiones != 0:
+                    contador_soft += 1*n_repeticiones
+
+                # restriccion soft 1 (huecos entre medias para los profes)
+                asig_dia_profe = self.apf[i][horas_acum:horas_acum + horas_en_dia]
+                i_primera_asign_profe = next((i for i, asig in enumerate(asig_dia_profe) if asig != 0), 0)
+                i_ultima_asign_profe = next((i for i, asig in reversed(list(enumerate(asig_dia_profe))) if asig != 0),
+                                        len(asig_dia))
+                huecos = asig_dia_profe[i_primera_asign_profe:i_ultima_asign_profe + 1].count(0)
+                contador_soft += 1 * huecos
+
+                horas_acum += horas_en_dia
 
         peso_rhard = 10
         peso_rsoft = 1
@@ -97,7 +138,7 @@ class genotipo():
 
                 horas_acum += horas_en_dia
 
-            plt.title(clase_label)#, y=1.15)
+            plt.title(clase_label)
 
         fig.show()
 
@@ -106,14 +147,26 @@ def mutar_genotipo(genotipo_a_mutar: genotipo):
     posn = random.randint(0, n-1)
     pos1m = random.randint(0, m-1)
     pos2m = random.randint(0, m-1)
-    genotipo_mutado = genotipo_a_mutar
+    genotipo_mutado = copy.deepcopy(genotipo_a_mutar)
     value = genotipo_mutado.cod[posn][pos1m]
     genotipo_mutado.cod[posn][pos1m] = genotipo_mutado.cod[posn][pos2m]
     genotipo_mutado.cod[posn][pos2m] = value
     genotipo_mutado.fitness = genotipo_mutado.calcular_fitness()
     return genotipo_mutado
 
-def combinar_genotipo(padre1: genotipo, padre2: genotipo):
-    hijo = padre1 + padre2
-    # TODO: completar
-    return hijo
+def recombinar_genotipos(padre1: genotipo, padre2: genotipo):
+    n_clases = len(padre1.cod)
+    clases_idx = [i for i in range(n_clases)]
+    mitad = int(n_clases/2)
+    clases_a_cambiar_idx = random.sample(clases_idx, mitad)
+    hijo1, hijo2 = copy.deepcopy(padre1), copy.deepcopy(padre2)
+
+    for clase in clases_a_cambiar_idx:
+        hijo1.cod[clase] = padre2.cod[clase]
+        hijo2.cod[clase] = padre1.cod[clase]
+
+    hijo1.fitness = hijo1.calcular_fitness()
+    hijo2.fitness = hijo2.calcular_fitness()
+
+
+    return hijo1, hijo2

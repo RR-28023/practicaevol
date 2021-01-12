@@ -54,6 +54,8 @@ Para representar una posible solución usaremos la matriz **Genotipo~mxt~**, don
 
 Nótese que la solución no especifica qué profesor es asignado para dar una determinada asignatura a una determinada clase. Esto es porque vamos a diseñar el algoritmo de modo que al generar una posible solución, el profesor asignado a cada clase-asignatura sea el correcto. Al fin y al cabo esto es una condición *hard* que hay que cumplir, y permite simplificar la notación y reducir el tamaño del espacio de búsqueda. 
 
+Asociada a la matriz **Genotipo~mxt~**, en el código también se crea la matriz **Asignatura_Profesor_Franja~pxt~**, abreviado como **APF~pxt~**, en la que el elemento *ij* representa la asignatura asignada al profesor *i* en la franja *j*. Si no hay asignatura asignada, *ij* valdrá 0. Si hay más de una asignatura asignada al profesor *i* en la franja *j*, *ij* valdrá -1. Esta matriz no añade información adicional y se deduce enteramente de la matriz **Genotipo~mxt~**, pero se crea por conveniencia para simplificar ciertos cálculos. 
+
 ### 2.4 Función de fitness
 
 La función de fitness implementada comprobará si las restricciones hard y soft mencionadas anteriormente se cumplen o no. Para ello, estarán disponibles dos contadores, uno para las restricciones hard y otro para las soft, donde en cada violación de una restricción su respectivo contador se verá incrementado. El coste del individuo será la suma de ambos contadores, sin embargo, dichos contadores serán multiplicados por unos pesos para poder simular que las restricciones hard tienen una importancia superior que las soft.
@@ -81,15 +83,15 @@ Las restricciones "hard" del algoritmo son las siguientes:
 
 Las restricciones "soft" del algoritmo son las siguientes:
 
-1. Los profesores deben tener el menor número de huecos posibles.
+1. Los profesores deben tener el menor número de huecos (horas vacías entre medias) posible. 
 
-1. El número total de periodos vacíos se debe distribuir uniformemente entre los profesores.
+1. El número de horas impartidas por un profesor deben distribuirse lo más uniformemente posible a lo largo de la semana. Por ejemplo, si un profesor tiene que dar en total 10 horas, es preferible que dé 2 horas cada día a que dé 5 horas en dos días.
 
-1. El número de horas impartidas por un profesor deben distribuirse lo más uniformemente posible a lo largo de la semana.
-
-1. El número de horas de una clase determinada debe repartirse lo más uniformemente posible (esto aplica en los casos en los que el número de horas semanales de la clase es inferior al número total de horas disponibles).
+1. El número total de periodos vacíos se debe distribuir uniformemente entre los profesores. PROPONGO CARGARNOS ESTA (QUE ES DIFICIL) Y EN SU LUGAR PONER: Si una clase tiene menos horas asignadas que horas hay en el horario lectivo, los espacios sin asignaturas deben estar lo más concentrados posible. Por ejemplo, si la semana lectiva son 25 horas (5 por día) y una clase tiene 20 horas asignadas, es preferible que tengan un día de la semana completamente libre a que tengan una hora libre cada día.
 
 1. Las clases no deben tener la misma asignatura más de una vez en el día.
+
+1. ESTA LA PUSE YO PERO CREO QUE ES IGUAL QUE LA ANTERIOR, NO? El número de horas de una clase determinada debe repartirse lo más uniformemente posible (esto aplica en los casos en los que el número de horas semanales de la clase es inferior al número total de horas disponibles).
 
 ## 4. Algoritmo
 
@@ -148,6 +150,10 @@ Insertar código
 ```
 
 ### 4.4 Recombinación
+
+Para realizar la recombinación, se toman dos individuos (*Padre 1* y *Padre 2*) y, siendo *n* el número total de clases, se seleccionan aleatoriamente *n/2* clases del *Padre 1* (*n/2 - 0.5* si *n* es impar) y las *n/2* clases complementarias del *Padre 2* (*n/2 + 0.5* si *n* es impar) combinándolas en un nuevo individuo, el *Hijo 1*. Por otro lado, las clases no seleccionadas de *Padre 1* y *Padre 2* se combinan para generar otro individuo adicional, el *Hijo 2*.
+
+Por ejemplo, si hay cuatro clases ('Clase A', 'Clase B', Clase C' y 'Clase D'). Una combinación posible sería formar el *Hijo 1* con la 'Clase A' y la 'Clase D' del *Padre 1*, y la 'Clase B' y la 'Clase C' del *Padre 2*. Mientras que el *Hijo 2* estaría formado por la 'Clase B' y la 'Clase C' del *Padre 1*, y la Clase A' y la 'Clase D' del *Padre 2*. 
 
 
 ### 4.5 Mutación
