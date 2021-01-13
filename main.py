@@ -89,17 +89,20 @@ def ejecutar_algoritmo(n_iter, tam_pop):
         poblacion, fit_mejor_sup = seleccionar_supervivientes(poblacion, tam_pop)
         print("Fitness mejor superviviente en iteración {0}: {1}".format(i + 1,fit_mejor_sup))
         mejores_fit.append(fit_mejor_sup)
-        if i == 290:
-            pass
+        if fit_mejor_sup == 0:
+            display=False
+            break;
+        display = True
     solucion = seleccionar_solucion(poblacion)
     plot_fitness_iteraciones(mejores_fit)
     solucion.plot_genotipo()
+    solucion.calcular_fitness(display=display)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     #ejecutar_algoritmo(100, 30)
 
-    ejecutar_algoritmo(n_iter=100, tam_pop=100)
+    ejecutar_algoritmo(n_iter=200, tam_pop=200)
     pass
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
