@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 
 def codificar_inputs():
@@ -17,6 +18,22 @@ def codificar_inputs():
     inputs_codificados['PCA'] = PCA
     inputs_codificados['DPF'] = DPF
 
+    # Muevo algunos cálculos aquí para evitar calcularlo en cada genotipo varias veces
+    inputs_codificados['horas_clase'] = [sum(clase) for clase in HCA]
+    dias = ['L', 'M', 'X', 'J', 'V']
+    inputs_codificados['horas_por_dia'] = [sum([dias[i] in f for f in franjas]) for i in range(len(dias))]
+    inputs_codificados['min_dias_hueco'] = min_num_dias_con_hueco(inputs_codificados['horas_por_dia'],
+                                                                  inputs_codificados['horas_clase'])
+
+    horas_profe = [0 for _ in profesores]
+    for a, asign in enumerate(asignaturas):
+        for c, clase in enumerate(HCA):
+            horas_asign_clase = clase[a]
+            idx_profe = PCA[c][a] - 1
+            horas_profe[idx_profe] += horas_asign_clase
+
+    inputs_codificados['reparto_ideal_huecos_profe'] = max_num_dias_con_hueco(inputs_codificados['horas_por_dia'],
+                                                                        horas_profe, profes_df)
 
     return inputs_codificados
 
@@ -85,13 +102,44 @@ def generar_DPF(profes_df, horas_df, franjas, profesores):
 
         horas_acum += horas_j
     return DPF
-#
-# def extraer_tuplas_profe_asignatura(clases_df):
-#
-#     asignaturas = [col.replace('horas_','') for col in clases_df.columns[1::2]]
-#     tuplas = set()
-#     for asignatura in asignaturas:
-#         for profe in clases_df['profesor_' + asignatura].unique():
-#             tuplas.add((asignatura,profe))
-#
-#     return tuplas
+
+def min_num_dias_con_hueco(horas_dia: list, horas_clase: list):
+    '''
+    Calcular cuál es el menor número de días necesarios con huecos si estos están lo
+    más compactados posible
+    Devuelve ese número para cada clase
+    '''
+    horas_dia_ord = sorted(horas_dia, reverse=True)
+    min_num_dias_hueco = []
+    for i in range(len(horas_clase)):
+        tot_huecos_semana = sum(horas_dia) - horas_clase[i]
+        for i, h in enumerate(horas_dia_ord):
+            if tot_huecos_semana <= 0:
+                break
+            tot_huecos_semana -= h
+        min_num_dias_hueco.append(i)
+
+    return min_num_dias_hueco
+
+def max_num_dias_con_hueco(horas_dia: list, horas_profe: list, profes_df):
+    '''
+    Calcular cuál es el reparto ideal de horas libres cada dia que un profe puede tener si se reparten todas sus horas
+    libres lo más uniformemente posible a lo largo de la semana.
+    Devuelve una lista con una lista cada profesorm con el reparto ideal ordenado de más horas a menos
+    '''
+    reparto_ideal_profes = []
+    for i in range(len(horas_profe)): # len(horas_profe) = número de profesores
+        dias_no_disp = profes_df.iloc[i,1:].tolist()
+        horas_no_disp = [x1*x2 for (x1, x2) in zip(dias_no_disp, horas_dia)]
+        tot_huecos_semana = sum(horas_dia) - sum(horas_no_disp) - horas_profe[i]
+        reparto_ideal = [0]*5
+        i = 0
+        while tot_huecos_semana > 0:
+            if dias_no_disp[i] == 1:
+                i += -4 if i == 4 else 1
+                continue
+            reparto_ideal[i] +=1
+            tot_huecos_semana += -1
+            i += -4 if i == 4 else 1
+        reparto_ideal_profes.append(sorted(reparto_ideal, reverse=True))
+    return reparto_ideal_profes
