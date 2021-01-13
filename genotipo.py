@@ -61,8 +61,14 @@ class genotipo():
         dias = ['L', 'M', 'X', 'J', 'V']
         contador_hard = 0
         contador_soft = 0
+        HCA = copy.deepcopy(self.inputs['HCA'])
+        tot_horas_clase = [sum(clase) for clase in HCA]
+
 
         for i, clase in enumerate(self.inputs['clases']):
+
+            tot_huecos = len(self.inputs['franjas']) - tot_horas_clase[i]
+
             for j, franja in enumerate(self.inputs['franjas']):
                 asign = self.cod[i][j] -1
                 if asign != -1:
@@ -80,9 +86,12 @@ class genotipo():
                         contador_hard += 1
 
             horas_acum = 0
+            dias_con_hueco = 0
+            optimo_dias_con_hueco = 1
             for ndia in range(len(dias)):
                 horas_en_dia = sum(dias[ndia] in f for f in self.inputs['franjas'])
                 asig_dia = self.cod[i][horas_acum:horas_acum+horas_en_dia]
+                dias_con_hueco += 1 if 0 in asig_dia else 0
 
                 # restriccion hard 6 (huecos entre medias para las clases)
                 i_primera_asign = next((i for i, asig in enumerate(asig_dia) if asig != 0),0)
@@ -104,6 +113,10 @@ class genotipo():
                 contador_soft += 1 * huecos
 
                 horas_acum += horas_en_dia
+                optimo_dias_con_hueco += 1 if horas_acum < tot_huecos else 0 # Mínimo número posible de días con hueco
+
+            # restricción soft 3 (huecos de las clases mejor que estén concentrados)
+            contador_soft += (dias_con_hueco - optimo_dias_con_hueco)
 
         peso_rhard = 10
         peso_rsoft = 1
