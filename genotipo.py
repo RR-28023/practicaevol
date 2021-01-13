@@ -54,13 +54,13 @@ class genotipo():
 
 
 
-    def calcular_fitness(self):
+    def calcular_fitness(self, display=False):
 
         self.apr = self.generar_horario_profesores() # Necesario si el genotipo se ha copiado en lugar de inicializarse.
 
         dias = ['L', 'M', 'X', 'J', 'V']
-        contador_hard = 0
-        contador_soft = 0
+        contador_hard = np.zeros(3)
+        contador_soft = np.zeros(5)
         HCA = copy.deepcopy(self.inputs['HCA'])
         tot_horas_clase = [sum(clase) for clase in HCA]
 
@@ -75,7 +75,7 @@ class genotipo():
                     # restriccion hard 1 (disp. profesor)
                     profesor_asign = self.inputs['PCA'][i][asign]
                     if self.inputs['DPF'][profesor_asign - 1][j] == 0:
-                        contador_hard += 1
+                        contador_hard[0] += 1
 
                     # restriccion hard 3 (dos asignaturas a la vez mismo profesor)
                     profesores_otras_clases = []
@@ -83,7 +83,7 @@ class genotipo():
                         if c != i and self.cod[c][j] != 0:
                             profesores_otras_clases.append(self.inputs['PCA'][c][self.cod[c][j]-1])
                     if profesor_asign in profesores_otras_clases:
-                        contador_hard += 1
+                        contador_hard[1] += 1
 
             horas_acum = 0
             dias_con_hueco = 0
@@ -97,12 +97,12 @@ class genotipo():
                 i_primera_asign = next((i for i, asig in enumerate(asig_dia) if asig != 0),0)
                 i_ultima_asign = next((i for i, asig in reversed(list(enumerate(asig_dia))) if asig != 0),len(asig_dia))
                 huecos = asig_dia[i_primera_asign:i_ultima_asign + 1].count(0)
-                contador_hard += 1*huecos
+                contador_hard[2] += 1*huecos
 
                 # restriccion soft 5 (misma asignatura en el día) - Penaliza más si hay más asignaturas repes
                 n_repeticiones = len(asig_dia) - len(set(asig_dia) -{0}) - asig_dia.count(0)
                 if n_repeticiones != 0:
-                    contador_soft += 1*n_repeticiones
+                    contador_soft[4] += 1*n_repeticiones
 
                 # restriccion soft 1 (huecos entre medias para los profes)
                 asig_dia_profe = self.apf[i][horas_acum:horas_acum + horas_en_dia]
@@ -110,7 +110,7 @@ class genotipo():
                 i_ultima_asign_profe = next((i for i, asig in reversed(list(enumerate(asig_dia_profe))) if asig != 0),
                                         len(asig_dia))
                 huecos = asig_dia_profe[i_primera_asign_profe:i_ultima_asign_profe + 1].count(0)
-                contador_soft += 1 * huecos
+                #contador_soft[0] += 1 * huecos
 
                 horas_acum += horas_en_dia
                 optimo_dias_con_hueco += 1 if horas_acum < tot_huecos else 0 # Mínimo número posible de días con hueco
@@ -118,8 +118,20 @@ class genotipo():
             # restricción soft 3 (huecos de las clases mejor que estén concentrados)
             contador_soft += (dias_con_hueco - optimo_dias_con_hueco)
 
+
+
+        if display == True:
+            print("Solución - Restricción hard ", 1, ":", contador_hard[0])
+            print("Solución - Restricción hard ", 3, ":", contador_hard[1])
+            print("Solución - Restricción hard ", 6, ":", contador_hard[2])
+            for i, r in enumerate(contador_soft):
+                print("Solución - Restricción soft", i+1, ":", r)
+
         peso_rhard = 10
         peso_rsoft = 1
+        contador_hard = int(np.sum(contador_hard))
+        contador_soft = int(np.sum(contador_soft))
+
         fitness = peso_rhard*contador_hard + peso_rsoft*contador_soft
         return fitness
 
@@ -133,7 +145,11 @@ class genotipo():
             ax = fig.add_subplot(round(n_clases/2.0), round(n_clases/2.0), c)
             ax.yaxis.grid()
             ax.set_xlim(0.5, len(dias) + 0.5)
-            ax.set_ylim(14.1, 7.9)
+            horas_dia = []
+            for ndia in range(len(dias)):
+                horas_dia.append(sum(dias[ndia] in f for f in self.inputs['franjas']))
+            max_horas_dia = max(horas_dia)
+            ax.set_ylim(7.9+max_horas_dia+0.2, 7.9)
             ax.set_xticks(range(1, len(dias) + 1))
             ax.set_xticklabels(dias)
             ax.set_ylabel('Hora')
@@ -181,5 +197,17 @@ def recombinar_genotipos(padre1: genotipo, padre2: genotipo):
     hijo1.fitness = hijo1.calcular_fitness()
     hijo2.fitness = hijo2.calcular_fitness()
 
+    """
+    #Otra posible propuesta de recombinación
+    n_clases = len(padre1.cod)
+    mitad = int(n_clases / 2)
+    hijo1, hijo2 = copy.deepcopy(padre1), copy.deepcopy(padre2)
 
+    for clase in range(mitad, n_clases):
+        hijo1.cod[clase] = padre2.cod[clase]
+        hijo2.cod[clase] = padre1.cod[clase]
+
+    hijo1.fitness = hijo1.calcular_fitness()
+    hijo2.fitness = hijo2.calcular_fitness()
+    """
     return hijo1, hijo2
