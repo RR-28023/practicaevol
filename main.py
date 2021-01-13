@@ -69,6 +69,8 @@ def plot_fitness_iteraciones(valores_mejor_fitness):
     x = [i + 1 for i in range(len(valores_mejor_fitness))]
     ax = sns.lineplot(x=x, y=valores_mejor_fitness)
     ax.set(xlabel='Iteración', ylabel='Fitness')
+    ax.text(x=x[-1] - len(x)*0.02, y= valores_mejor_fitness[-1] + 5,
+            s= valores_mejor_fitness[-1], color = 'black')
     plt.show()
 
 
@@ -78,6 +80,8 @@ def ejecutar_algoritmo(n_iter, tam_pop):
     :param n_iter: número de iteraciones
     :param tam_pop: tamaño de la población
     '''
+    random.seed(33)
+    np.random.seed(33)
     num_padres = int(tam_pop / 5) #Se seleccionarán una quinta parte de la población
     inputs = codificar_inputs()
     poblacion = inicializar_poblacion(inputs, tam_pop)
@@ -89,8 +93,7 @@ def ejecutar_algoritmo(n_iter, tam_pop):
         poblacion, fit_mejor_sup = seleccionar_supervivientes(poblacion, tam_pop)
         print("Fitness mejor superviviente en iteración {0}: {1}".format(i + 1,fit_mejor_sup))
         mejores_fit.append(fit_mejor_sup)
-        if i == 290:
-            pass
+
     solucion = seleccionar_solucion(poblacion)
     plot_fitness_iteraciones(mejores_fit)
     solucion.plot_genotipo()
