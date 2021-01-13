@@ -74,14 +74,14 @@ def plot_fitness_iteraciones(valores_mejor_fitness):
     plt.show()
 
 
-def ejecutar_algoritmo(n_iter, tam_pop):
+def ejecutar_algoritmo(n_iter, tam_pop, seed):
     '''
     Función principal para ejecutar todos los pasos e iteraciones del algoritmo evolutivo. No devuelve ningún objeto.
     :param n_iter: número de iteraciones
     :param tam_pop: tamaño de la población
     '''
-    random.seed(33)
-    np.random.seed(33)
+    random.seed(seed)
+    np.random.seed(seed)
     num_padres = int(tam_pop / 5) #Se seleccionarán una quinta parte de la población
     inputs = codificar_inputs()
     poblacion = inicializar_poblacion(inputs, tam_pop)
@@ -106,7 +106,7 @@ def ejecutar_algoritmo(n_iter, tam_pop):
 if __name__ == '__main__':
     #ejecutar_algoritmo(100, 30)
 
-    ejecutar_algoritmo(n_iter=200, tam_pop=200)
+    ejecutar_algoritmo(n_iter=200, tam_pop=200, seed=33)
     pass
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
