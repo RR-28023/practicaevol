@@ -20,7 +20,7 @@ def codificar_inputs():
 
     return inputs_codificados
 
-def extraer_inputs(filepath='.\\datos\\Generador inputs horarios.xlsx'):
+def extraer_inputs(filepath='.\\datos\\Generador inputs horarios 1.xlsx'):
     '''
     Extrae inputs del excel, eliminando filas y columnas vacías.
     Devuelve tres dataframes
