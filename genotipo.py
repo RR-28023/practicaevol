@@ -116,7 +116,7 @@ class genotipo():
                 optimo_dias_con_hueco += 1 if horas_acum < tot_huecos else 0 # Mínimo número posible de días con hueco
 
             # restricción soft 3 (huecos de las clases mejor que estén concentrados)
-            contador_soft += (dias_con_hueco - optimo_dias_con_hueco)
+            contador_soft[2] += (dias_con_hueco - optimo_dias_con_hueco)
 
 
 

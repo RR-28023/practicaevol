@@ -95,7 +95,7 @@ def ejecutar_algoritmo(n_iter, tam_pop):
         mejores_fit.append(fit_mejor_sup)
         if fit_mejor_sup == 0:
             display=False
-            break;
+            break
         display = True
     solucion = seleccionar_solucion(poblacion)
     plot_fitness_iteraciones(mejores_fit)
