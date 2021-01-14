@@ -29,7 +29,6 @@ def seleccionar_supervivientes(poblacion, tam_pop):
     fitness_mejor_superviviente = sorted(supervivientes, key=operator.attrgetter('fitness'), reverse=False)[0].fitness
     return supervivientes, fitness_mejor_superviviente
 
-
 def seleccionar_padres(poblacion,tam_pop, num_padres):
     '''
     Selección de los padres mediante el método del torneo
@@ -69,20 +68,28 @@ def plot_fitness_iteraciones(valores_mejor_fitness):
     x = [i + 1 for i in range(len(valores_mejor_fitness))]
     ax = sns.lineplot(x=x, y=valores_mejor_fitness)
     ax.set(xlabel='Iteración', ylabel='Fitness')
+    ax.text(x=x[-1] - len(x)*0.02, y= valores_mejor_fitness[-1] + 5,
+            s= valores_mejor_fitness[-1], color = 'black')
     plt.show()
 
-
-def ejecutar_algoritmo(n_iter, tam_pop):
+def ejecutar_algoritmo(n_iter, tam_pop, seed):
     '''
     Función principal para ejecutar todos los pasos e iteraciones del algoritmo evolutivo. No devuelve ningún objeto.
     :param n_iter: número de iteraciones
     :param tam_pop: tamaño de la población
     '''
+    random.seed(seed)
+    np.random.seed(seed)
     num_padres = int(tam_pop / 5) #Se seleccionarán una quinta parte de la población
     inputs = codificar_inputs()
     poblacion = inicializar_poblacion(inputs, tam_pop)
     mejores_fit = []
     for i in range(n_iter):
+        if i == 0 and True: # Para ver visualmente como mejora (desactivado ahora)
+            mejor_individuo_inicial = seleccionar_solucion(poblacion)
+            mejor_individuo_inicial.plot_genotipo()
+            mejor_individuo_inicial.plot_horario_profesores()
+
         padres = seleccionar_padres(poblacion, tam_pop, num_padres)
         poblacion =  recombinar_padres(poblacion, padres)
         poblacion = mutar_individuos(poblacion, padres)
@@ -91,18 +98,19 @@ def ejecutar_algoritmo(n_iter, tam_pop):
         mejores_fit.append(fit_mejor_sup)
         if fit_mejor_sup == 0:
             display=False
-            break;
+            break
         display = True
     solucion = seleccionar_solucion(poblacion)
     plot_fitness_iteraciones(mejores_fit)
     solucion.plot_genotipo()
+    solucion.plot_horario_profesores()
     solucion.calcular_fitness(display=display)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     #ejecutar_algoritmo(100, 30)
 
-    ejecutar_algoritmo(n_iter=200, tam_pop=200)
+    ejecutar_algoritmo(n_iter=400, tam_pop=100, seed=33)
     pass
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
