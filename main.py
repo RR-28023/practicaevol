@@ -29,7 +29,6 @@ def seleccionar_supervivientes(poblacion, tam_pop):
     fitness_mejor_superviviente = sorted(supervivientes, key=operator.attrgetter('fitness'), reverse=False)[0].fitness
     return supervivientes, fitness_mejor_superviviente
 
-
 def seleccionar_padres(poblacion,tam_pop, num_padres):
     '''
     Selección de los padres mediante el método del torneo
@@ -73,7 +72,6 @@ def plot_fitness_iteraciones(valores_mejor_fitness):
             s= valores_mejor_fitness[-1], color = 'black')
     plt.show()
 
-
 def ejecutar_algoritmo(n_iter, tam_pop, seed):
     '''
     Función principal para ejecutar todos los pasos e iteraciones del algoritmo evolutivo. No devuelve ningún objeto.
@@ -87,6 +85,11 @@ def ejecutar_algoritmo(n_iter, tam_pop, seed):
     poblacion = inicializar_poblacion(inputs, tam_pop)
     mejores_fit = []
     for i in range(n_iter):
+        if i == 0 and True: # Para ver visualmente como mejora (desactivado ahora)
+            mejor_individuo_inicial = seleccionar_solucion(poblacion)
+            mejor_individuo_inicial.plot_genotipo()
+            mejor_individuo_inicial.plot_horario_profesores()
+
         padres = seleccionar_padres(poblacion, tam_pop, num_padres)
         poblacion =  recombinar_padres(poblacion, padres)
         poblacion = mutar_individuos(poblacion, padres)
@@ -100,13 +103,14 @@ def ejecutar_algoritmo(n_iter, tam_pop, seed):
     solucion = seleccionar_solucion(poblacion)
     plot_fitness_iteraciones(mejores_fit)
     solucion.plot_genotipo()
+    solucion.plot_horario_profesores()
     solucion.calcular_fitness(display=display)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     #ejecutar_algoritmo(100, 30)
 
-    ejecutar_algoritmo(n_iter=200, tam_pop=200, seed=33)
+    ejecutar_algoritmo(n_iter=400, tam_pop=100, seed=33)
     pass
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

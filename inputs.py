@@ -22,8 +22,12 @@ def codificar_inputs():
     inputs_codificados['horas_clase'] = [sum(clase) for clase in HCA]
     dias = ['L', 'M', 'X', 'J', 'V']
     inputs_codificados['horas_por_dia'] = [sum([dias[i] in f for f in franjas]) for i in range(len(dias))]
-    inputs_codificados['min_dias_hueco'] = min_num_dias_con_hueco(inputs_codificados['horas_por_dia'],
+    inputs_codificados['max_dias_libres'] = max_dias_libres_clases(inputs_codificados['horas_por_dia'],
                                                                   inputs_codificados['horas_clase'])
+
+    inputs_codificados['reparto_ideal_huecos_clases'] = reparto_ideal_huecos_clases(inputs_codificados['horas_por_dia'],
+                                                                  inputs_codificados['horas_clase'],
+                                                                  inputs_codificados['max_dias_libres'])
 
     horas_profe = [0 for _ in profesores]
     for a, asign in enumerate(asignaturas):
@@ -32,8 +36,8 @@ def codificar_inputs():
             idx_profe = PCA[c][a] - 1
             horas_profe[idx_profe] += horas_asign_clase
 
-    inputs_codificados['reparto_ideal_huecos_profe'] = max_num_dias_con_hueco(inputs_codificados['horas_por_dia'],
-                                                                        horas_profe, profes_df)
+    inputs_codificados['reparto_ideal_huecos_profe'] = reparto_ideal_huecos_profes(inputs_codificados['horas_por_dia'],
+                                                                                   horas_profe, profes_df)
 
     return inputs_codificados
 
@@ -103,25 +107,25 @@ def generar_DPF(profes_df, horas_df, franjas, profesores):
         horas_acum += horas_j
     return DPF
 
-def min_num_dias_con_hueco(horas_dia: list, horas_clase: list):
+def max_dias_libres_clases(horas_dia: list, horas_clase: list):
     '''
-    Calcular cuál es el menor número de días necesarios con huecos si estos están lo
-    más compactados posible
+    Calcular cuál es el máximo número de días libres que una clase puede tener dado su númro total de horas y el
+    horario lectivo
     Devuelve ese número para cada clase
     '''
     horas_dia_ord = sorted(horas_dia, reverse=True)
-    min_num_dias_hueco = []
-    for i in range(len(horas_clase)):
+    max_dias_libres = []
+    for i in range(len(horas_clase)): # len(horas_clase) = número de clases
         tot_huecos_semana = sum(horas_dia) - horas_clase[i]
         for i, h in enumerate(horas_dia_ord):
-            if tot_huecos_semana <= 0:
+            if tot_huecos_semana < 0:
                 break
             tot_huecos_semana -= h
-        min_num_dias_hueco.append(i)
+        max_dias_libres.append(i-1)
 
-    return min_num_dias_hueco
+    return max_dias_libres
 
-def max_num_dias_con_hueco(horas_dia: list, horas_profe: list, profes_df):
+def reparto_ideal_huecos_profes(horas_dia: list, horas_profe: list, profes_df):
     '''
     Calcular cuál es el reparto ideal de horas libres cada dia que un profe puede tener si se reparten todas sus horas
     libres lo más uniformemente posible a lo largo de la semana.
@@ -143,3 +147,27 @@ def max_num_dias_con_hueco(horas_dia: list, horas_profe: list, profes_df):
             i += -4 if i == 4 else 1
         reparto_ideal_profes.append(sorted(reparto_ideal, reverse=True))
     return reparto_ideal_profes
+
+def reparto_ideal_huecos_clases(horas_dia: list, horas_clase: list, max_dias_libres_clase: list):
+    '''
+    Calcular cuál es el reparto ideal de horas libres que una clase puede tener de acuerdo con las restricciones
+    soft de tener el número máximo de días libres y despúes.
+    Devuelve una lista con una lista cada profesorm con el reparto ideal ordenado de más horas a menos
+    '''
+    reparto_ideal_huecos_clases = []
+    for i in range(len(horas_clase)): # len(horas_clase) = número de clases
+        tot_huecos_semana = sum(horas_dia) - horas_clase[i]
+        reparto_ideal = [0]*5
+        num_dias_libres_ideal = max_dias_libres_clase[i]
+        i = 0
+        while tot_huecos_semana > 0:
+            if i < num_dias_libres_ideal:
+                reparto_ideal[i] = sorted(horas_dia, reverse=True)[i]
+                tot_huecos_semana += -1*reparto_ideal[i]
+                i += -4 if i == 4 else 1
+                continue
+            reparto_ideal[i] +=1
+            tot_huecos_semana += -1
+            i += -4 if i == 4 else 1
+        reparto_ideal_huecos_clases.append(sorted(reparto_ideal, reverse=True))
+    return reparto_ideal_huecos_clases
