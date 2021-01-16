@@ -108,9 +108,7 @@ def ejecutar_algoritmo(n_iter, tam_pop, seed):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    #ejecutar_algoritmo(100, 30)
 
-    ejecutar_algoritmo(n_iter=400, tam_pop=100, seed=33)
+    ejecutar_algoritmo(n_iter=1000, tam_pop=500, seed=42)
     pass
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/

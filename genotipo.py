@@ -134,8 +134,8 @@ class genotipo():
                 rep_huecos_profe[ndia] = sum([1 if a == 0 else 0 for a in asig_dia_profe])
             rep_huecos_profe = sorted(rep_huecos_profe, reverse=True)
             rep_ideal_profe = self.inputs['reparto_ideal_huecos_profe'][p]
-            contador_soft[1] += sum(np.abs([r1 - r2 for (r1,r2) in zip(rep_ideal_profe, rep_huecos_profe)]))
-
+            if sum(np.abs([r1 - r2 for (r1,r2) in zip(rep_ideal_profe, rep_huecos_profe)])) > 0:
+                contador_soft[1] += 1
 
 
 
@@ -146,7 +146,7 @@ class genotipo():
             for i, r in enumerate(contador_soft):
                 print("Solución - Restricción soft", i+1, ":", r)
 
-        peso_rhard = 10
+        peso_rhard = 50
         peso_rsoft = 1
         contador_hard = int(np.sum(contador_hard))
         contador_soft = int(np.sum(contador_soft))
