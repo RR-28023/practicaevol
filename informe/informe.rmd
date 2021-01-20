@@ -73,13 +73,14 @@ Las restricciones "hard" del algoritmo son las siguientes:
 
 1. No se pueden asignar dos clases a la vez al mismo profesor. Esta restricción se deberá tener en cuenta en la evaluación de cada individuo.
 
-1. Se deben asignar todas las horas de las asignaturas a cada clase. Esta restricción no es necesario que se tenga en cuenta para ser evaluada debido a que esta se cumple a la hora de crear cada uno de los genotipos.
+1. Se deben asignar el número de horas exacto de las asignaturas a cada clase, ni más ni menos horas. Esta restricción no es necesario que se tenga en cuenta para ser evaluada debido a que esta se cumple a la hora de crear cada uno de los genotipos.
 
 1. Las asignaturas se deben asignar al profesor definido en los inputs aunque haya otros profesores que impartan esa asignatura a otra clase. Esta restricción, tal como se ha explicado anteiormente, vendá implícita en la codificación del genotipo gracias a la matriz *Profesor_Clase_Asignatura~mxn~* implementada.
 
 1. Las clases no pueden tener horas vacías entre medias pero si pueden tener horas vacías al principio y al final de la jornada si el número de horas semanales de esa clase es inferior al número total de horas disponibles.
 
 1. Únicamente se podrá dar clase dentro del horario establecido. Esta restricción se satisfacerá ya que en la codificación de los individuos ya vienen establacidas dichas franjas horarias, por lo que únicamente se podrán asignar horas de asignaturas dentro de las franjas establecidas.
+
 
 Las restricciones "soft" del algoritmo son las siguientes:
 
@@ -155,6 +156,9 @@ Para realizar la recombinación, se toman dos individuos (*Padre 1* y *Padre 2*)
 
 Por ejemplo, si hay cuatro clases ('Clase A', 'Clase B', Clase C' y 'Clase D'). Una combinación posible sería formar el *Hijo 1* con la 'Clase A' y la 'Clase D' del *Padre 1*, y la 'Clase B' y la 'Clase C' del *Padre 2*. Mientras que el *Hijo 2* estaría formado por la 'Clase B' y la 'Clase C' del *Padre 1*, y la Clase A' y la 'Clase D' del *Padre 2*. 
 
+```
+Insertar código
+```
 
 ### 4.5 Mutación
 
@@ -174,8 +178,101 @@ El método de la ruleta consiste en dotar a cada individuo de una probabilidad p
 Insertar código
 ```
 
+### Salidas del algoritmo
+
+El algoritmo implementado ofrece de forma visual el fitness del mejor superviviento de cada iteración para poder seguir el proceso.
+
+FALTA PONER IMAGEN
+
+Ofrece, una vez finalizado, el número de veces qu el inididuo final infringe cada una de las restricciones tanto hard como soft.
+
+FALTA PONER IMAGEN
+
+Y, finalmente, se ofrece de forma visual el horario de cada una de las clases y de cada uno de los profesores. Esto se muestra para el mejor indivduo inicial y el individuo final para poder comparar los cambios sucedidos durante el algoritmo.
+
+FALTA PONER IMAGEN
 
 
+## 5. Pruebas realizadas
+
+Para testear el algoritmo se han utilizado diferentes entradas las cuales se ha ido incrementando en cada una de ellas su dificultad para el algoritmo. Dichas pruebas se han llevado a cabo con un tamaño de la población igual a 500 y con un máximo de 1000 iteraciones. Además, se ha estimado que el número de padres que se elegirán será 1/5 de la población total.
+
+Finalmente, añadir que estos son solo algunas de las entradas creadas dentro de la gran posibilidad de entardas que existen, por ello, destacar que un pequeño cambio en este conjunto de datos de entrada puede conllevar grandes cambios en el algoritmo, y consecuentemente resultados totalmente diferentes.
+
+### 5.1 Entrada 1
+
+El primer conjunto de inputs utilizado está compuesto por:
+
+* 11 profesores que únicamente dan una asignatura, una diferente cada uno
+* 4 grupos de clase con el mismo número de horas de clase cada uno
+* 12 asignaturas
+* Todos los profesores tienen una disponibilidad horaria en todas la horas
+* El horario lectivo es de 8h a 14h toda la semana
+
+
+El resultado obtenido es de un valor de fitness de X. En este caso, no se ha infringido ninguna restricción hard pero si han infringido algunas restricicones soft, X veces la restrccion soft X y X veces la restriccion soft X, propiciando el valor de fitness obtenido.
+
+En cuanto a la gráfica (imagen X), se puede apreciar en las primeras iteraciones un descenso rápido en el valor de fitness que se va atenuando siendo más constante a medida que avanzan las iteraciones.
+
+En cuanto a la comparativa entre el mejor individuo de la población inicial y el indivudo final (imagen x), se puede ver como han desaparecido los huecos sin clase y se han eliminado en mayor parte la repetición de una misma asignatura el mismo día.
+
+Sobre la imagen X que compara los horarios de los profesores entre el mejor individuo de la población inicial y el indivudo final, ver como se ha conseguido evitar el solapamiento, se ha conseguido que el profesor dé todas sus clases de forma seguida y que el número de horas de clase sea uniforme durante todos los días de la semana.
+
+FALTA PONER IMÁGENES Y RESULTADOS
+
+### 5.2 Entrada 2
+
+El segundo conjunto de inputs utilizado es prácticamente igual al anterior con la única diferencia de que en este caso los profesores no tienen un disponibilidad horaria completo por lo que habrá días en los que no podrán ejercer.
+
+El resultado obtenido ha sido de un valor de fitness de X. En este caso, no se ha infringido ninguna restricción hard pero si han infringido algunas restricicones soft, X veces la restrccion soft X y X veces la restriccion soft X, propiciando el valor de fitness obtenido.
+
+Ver en las imágenes X y X como, además de todas las mejoras vistas en la entrada anterior respecto al primer indiduo y el individuo final, también se puede apreciar como los días marcados en verde, los cuales indican que el profesor no tiene disponibilidad, no se han asignado ninguna hora de clase ese día. 
+
+FALTA PONER IMÁGENES Y RESULTADOS
+
+### 5.3 Entrada 3
+
+El tercer conjunto de inputs utilizado está compuesto por:
+
+* 5 profesores que pueden dar diferentes asignaturas a diferentes clases
+* 4 grupos de clase con el mismo número de horas de clase cada uno
+* 12 asignaturas
+* Los profesores hay días en los que no tienen disponibilidad
+* El horario lectivo es de 8h a 14h toda la semana
+
+El valor de fitness obtenido ha sido de X. Este caso, no ha tenido ninguna violación de las restricciones hard pero si alguna de las restricciones soft.
+
+Además, indicar, tal como se ve en la imagen X, como al ser menos profesores que la entradas anteriores se ha tenido que ajustar en gran medida los horarios de los profesores pero siempre respetando los dias que no tienen disponibilidad.
+
+FALTA PONER IMÁGENES Y RESULTADOS
+
+### 5.4 Entrada 4
+
+El cuarto conjunto de inputs utilizado está compuesto por:
+
+* 11 profesores que pueden dar diferentes asignaturas a diferentes clases
+* 4 grupos de clase con diferente número de horas de clase cada uno
+* 12 asignaturas
+* Los profesores hay días en los que no tienen disponibilidad
+* El horario lectivo es de 8-14h el lunes, de 8-15h los martes, miércoles y jueves y de 8-13h los viernes
+
+FALTA PONER IMÁGENES Y RESULTADOS
+
+## 6. Modificaciones del algoritmo
+
+### 6.1 Modificación técnica selección de padres
+
+Para modificar el algoritmo y comparar si existe una mejora en los resultados se han propuesto dos nuevas ténicas de selección de padres. 
+En primer lugar, se ha implementado un método de selección totalmente aleatorio donde no se tendrá en cuenta el valor de fitness. 
+En segundo lugar, se ha implementado la técnica de selección del muestreo universal estocástico (SUS) desarrollado por James Baker. Esta técnica es similar a la técnica de selección de la ruleta implementada anteriormente. Ambas técnicas utilizan los valores de fitness de los individuos para indicar la probabilidad de que salgan elegidos siendo la porción de la ruleta mayor en el indivduo con mejor fitness, sin embargo, la diferencia que existe entre ambas técnicas es que la técnica de la ruleta realiza *n* tiradas obteniendo cada vez un individuo y la técnica SUS únicamente realiza una tirada donde selecciona a todos los individuos mediante intervalos uniformente repartidos sobre la ruleta.
+
+FALTA PONER RESULTADOS
+
+### 6.2 Modificación operador de recombinación
+
+Por otro lado, se ha propuesto un nuevo operador de recombinación. El operador anteriormente implementado elegía de forma aleatoria las clases que que pertenecían a un padre o al otro, sin embargo, este operador realiza la recombinación siempre del mismo modo, la primera mitad de clases serán de un padre y la segunda mitad del otro.
+
+FALTA PONER RESULTADOS
 
 $$
 \textit{Formula} = 
