@@ -19,6 +19,7 @@ def seleccionar_supervivientes(poblacion, tam_pop):
     '''
     Selección de los supervivientes mediante el método de la ruleta
     '''
+
     poblacion_ordenada = sorted(poblacion, key=operator.attrgetter('fitness'), reverse=False)
     peor_valor_fitness = poblacion_ordenada[len(poblacion_ordenada)-1].fitness + 1
     pesos = [(peor_valor_fitness - i.fitness) for i in poblacion]
@@ -28,6 +29,41 @@ def seleccionar_supervivientes(poblacion, tam_pop):
     supervivientes = supervivientes.tolist()
     fitness_mejor_superviviente = sorted(supervivientes, key=operator.attrgetter('fitness'), reverse=False)[0].fitness
     return supervivientes, fitness_mejor_superviviente
+
+    '''
+    #Otra posible propuesta de método de selección.
+    #Selección totalmente aleatoria
+    
+    poblacion_ordenada = sorted(poblacion, key=operator.attrgetter('fitness'), reverse=False)
+    supervivientes = np.random.choice(poblacion, tam_pop, replace=False)
+    supervivientes = supervivientes.tolist()
+    fitness_mejor_superviviente = sorted(supervivientes, key=operator.attrgetter('fitness'), reverse=False)[0].fitness
+    return supervivientes, fitness_mejor_superviviente
+    '''
+
+    '''
+    #Otra posible propuesta de método de selección.
+    #Algoritmo SUS (Stochastic Universal Sampling) de James Baker
+
+    poblacion_ordenada = sorted(poblacion, key=operator.attrgetter('fitness'), reverse=False)
+    peor_valor_fitness = poblacion_ordenada[len(poblacion_ordenada)-1].fitness + 1
+    ruleta = []
+    for i in range(tam_pop):
+        valor = peor_valor_fitness - poblacion_ordenada[i].fitness
+        for j in range(valor):
+            ruleta.append(i)
+
+    posicion_inicio = random.randint(0, len(ruleta))
+    ruleta_resultados = np.concatenate((ruleta[posicion_inicio:len(ruleta)], ruleta[0:posicion_inicio]), axis=0)
+    num_individuos_elegir = int(len(ruleta)/tam_pop)
+    supervivientes = []
+    for i in range(0,len(ruleta),num_individuos_elegir):
+        if len(supervivientes)<tam_pop:
+            supervivientes.append(poblacion_ordenada[ruleta[i]])
+
+    fitness_mejor_superviviente = sorted(supervivientes, key=operator.attrgetter('fitness'), reverse=False)[0].fitness
+    return supervivientes, fitness_mejor_superviviente
+    '''
 
 def seleccionar_padres(poblacion,tam_pop, num_padres):
     '''
@@ -108,9 +144,7 @@ def ejecutar_algoritmo(n_iter, tam_pop, seed):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    #ejecutar_algoritmo(100, 30)
 
-    ejecutar_algoritmo(n_iter=400, tam_pop=100, seed=33)
+    ejecutar_algoritmo(n_iter=1000, tam_pop=500, seed=42)
     pass
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
