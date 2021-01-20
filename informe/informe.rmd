@@ -9,7 +9,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## 1.Enunciado
+## 0.Enunciado
 
 El objetivo de esta entrega es implementar un algoritmo evolutivo para la elaboración de  horarios  en  un  centro  educativo. Para ello:
 
@@ -22,12 +22,60 @@ c) Cread varias entradas con distintos grados de dificultad y analizad los resul
 d) Proponed alguna modificación al algoritmo y analizad los resultados obtenidos. Esta modificación puede ser un nuevo operador de mutación o recombinación,una nueva estrategia de selección de los individuos de la nueva generaciónm, etc.
 
 
+## 1. Restricciones *hard* y *soft*
+
+Un comentario preliminar es que, aunque el enunciado hable de secundaria y bachillerato, algunas de nuestras restricciones contemplan escenarios que son probables en el ámbito universitario, pero improbables en un instituto. Por ejemplo, que una clase tenga un día libre en la semana. Pese a esto, hemos querido incorporarlas en el algoritmo para darle más flexibilidad y comprobar cómo se comporta cuando hay muchas horas libres. Por tanto, en adelante se ha de suponer que el algoritmo está pensado para cualquier tipo de centro educativo, incluyendo la universidad.
+
+Las **restricciones *hard*** del algoritmo son las siguientes:
+
+1. **No se pueden asignar horas a un profesor fuera de su disponibilidad**. Por motivos de conciliación laboral esta restricción debe estar presente. La restricción se tiene en cuenta mediante la función de *fitness* y se computa comparando con un horario de disponibilidad que proporciona cada profesor. Estos horarios de disponibilidad forman parte de los *inputs*.
+
+1. **No se pueden asignar dos asignaturas a la vez a la misma clase**. Está restricción debe estar presente por razones obvias. La restricción se satisface implícitamente mediante el agoritmo de inicialización de los individuos, ya que en cada franja únicamente se asigna una única asignatura.
+
+1. **No se pueden asignar dos clases a la vez al mismo profesor**. Está restricción debe estar presente por razones obvias, y se tiene en cuenta mediante la función de *fitness*.
+
+1. **Se deben asignar el número de horas exacto de las asignaturas a cada clase**, ni más ni menos horas. Está restricción debe estar presente por razones obvias. La restricción se satisface implícitamente mediante el algoritmo de inicialización de los individuos, ya que asigna todas las horas a cada clase. Por tanto, no será necesario que se tenga en cuenta en la función de *fitness*. El número de horas de cada clase viene dado por los *inputs*.
+
+1. **Las asignaturas se deben asignar al profesor definido en los *inputs,*** aunque haya otros profesores que impartan esa asignatura a otra clase. Entendemos que esto tiene que ser una restricción *hard* puesto que, aunque haya profesores que den la misma asignatura, puede haber muchas razones por las que no sean intercambiables para una clase concreta (ej. distinto curso, necesidad de que el tutor de un mínimo número de horas a sus tutorandos, etc). Esta restricción se satisface implícitamente mediante la codificación del genotipo, tal como explicamos más adelante. 
+
+1. En los casos en los que el número de horas semanales de clase es inferior al número total de horas disponibles en el horario lectivo, **las clases no pueden tener horas vacías entre medias** pero sí pueden tener horas vacías al principio y al final de la jornada. Tratar esta restricción como *hard* busca generar soluciones en los que los alumnos no tengan ninguna hora vacía ya que esto no es nada deseable ni desde el punto de eficiencia para el alumno, ni desde el punto de vista organizativo para el centro (por ejemplo, habría que habilitar espacios para que estén los alumnos, profesores que los vigilen, etc). La restricción se tiene en cuenta mediante la función de *fitness*.
+
+1. **Únicamente se podrá dar clase dentro del horario lectivo** establecido. Está restricción debe estar presente por razones obvias. Esta restricción se satisface implícitamente mediante el algoritmo de inicialización, ya que en la codificación de los individuos ya vienen establacidas dichas franjas horarias y sólo se asignan horas de asignaturas dentro de las franjas establecidas. El horario lectivo de define en los *inputs*.
+
+Las **restricciones *soft*** del algoritmo son las siguientes:
+
+1. Los **profesores deben tener el menor número posible de horas vacías** entre medias (sí que pueden tener horas vacías al principio y al final de la jornada). Al contrario que en el caso de horas libres para los alumnos, esta restricción la hemos implementado como *soft* porque habrá casos en los que tener profesores con horas libres sea necesario para cuadrar los horarios y porque los profesores pueden aprovechar esas horas para realizar otro tipo de actividades en el centro (ej. evaluación). Esta restricción se tiene en cuenta mediante la función de *fitness*.
+
+1. El número de **horas impartidas por un profesor deben distribuirse lo más uniformemente posible** a lo largo de la semana. Por ejemplo, si un profesor tiene que dar en total 10 horas, es preferible que dé 2 horas cada día a que dé 5 horas en dos días. Esta restricción busca permitir que los profesores puedan conciliar su trabajo en el centro con su vida familiar o con otros trabajos. Esta restricción se tiene en cuenta mediante la función de *fitness*.
+
+1. Si una clase tiene menos horas asignadas que el total de horas lectivas y hay posibilidad de que **las asignaturas se concentren de modo que las clases tenga días libres**, está opción es la deseable. Por ejemplo, si la semana lectiva son 25 horas (5 por día) y una clase tiene 20 horas asignadas, es preferible que tengan un día de la semana completamente libre a que tengan una hora libre cada día. Esta restricción busca dar más tiempo libre a los alumnos al evitar que tengan que ir todos los días al centro si no es necesario. Esta restricción se tiene en cuenta mediante la función de *fitness*.
+
+1. **Las clases no deben tener la misma asignatura más de una vez en el día**. Esta restricción busca hacer la jornada lo más amena posible para los alumnos. Esta restricción se tiene en cuenta mediante la función de *fitness*.
+
+1. Si el número total de horas libres semanales de una clase es tal que tiene que haber **días que combinen horas libres y clase, es mejor que estas horas libres se repartan uniformemente entre todos los días**. Por ejemplo, si la semana lectiva son 30 horas (6 por día) y una clase tiene 20 horas asignadas, la clase tiene 10 horas libres. Por la restricción *soft* #3 es preferible que 6 de esas horas libres se concentren en un día. Pero además, las 4 horas libres restantes es preferible que se repartan entre los otros cuatro días, a que se concentren en un día que tendría 4 horas libres y 2 horas de clase. Esta restricción se tiene en cuenta mediante la función de *fitness*.
+
+
 ## 2. Codificación empleada
 
 ### 2.1 Información de entrada
-[TBC: explicar archivo excel y las dataframes que se generan]
 
-- Se supone que todas las clases son de una hora, yq ue no hay recreos
+Los *inputs* se introducen en el archivo en excel (*Generador inputs horarios.xlsx*), que después es leído por el código que ejecuta el algoritmo en *Python*. La función de este archivo excel es facilitar la realización de pruebas con distintas combinaciones de información de entrada y hacer algunos *checks* para asegurar que los datos que introducimos tienen solución.
+
+El archivo se divide en 4 secciones. En la sección 0 se introducen los nombres (los *labels*) de los profesores, las clases y las asignaturas. Al hacer esto se introduce implícitamente el número de total de profesores, clases y asignaturas. Además en esta sección se computan algunos daots agregados para comprobar que no hay incopatibilidades (por ejemplo, que a un profesor se le han asignado más horas de las que tiene disponibles)
+
+![Generador inputs horarios: Sección 0](imagenes/inputs_seccion_0)
+
+En la sección 1 se introduce, para cada clase, el número de horas semanales por asignatura (si una clase no tiene una asignatura, se asigna un 0) y el profesor que la imparte. Se supone una duración de una hora para todas las asignaturas (por lo que el número de horas tiene que ser un entero).
+
+![Generador inputs horarios: Sección 1](imagenes/inputs_seccion_1)
+
+En la sección 2 se introduce la disponibilidad de los profesores a lo largo de la semana. Para reducir los grados de libertad, se introduce a nivel día (en lugar de a nivel hora). Es decir, si los profesores están disponibles un día, lo están a cualquier hora del horario lectivo de ese día. Y viceversa, si no están disponibles, no lo están para ninguna hora de ese día.
+
+![Generador inputs horarios: Sección 2](imagenes/inputs_seccion_2)
+
+En la sección 3 se introduce el horario lectivo. Es decir, la hora a la que empiezan y acaban las clases cada día d ela semana. Para simplificar la implementación y dado que no cambiaría nada en relación a la técnica de resolución empleada, no se han tenido en cuenta recreos.
+
+![Generador inputs horarios: Sección 3](imagenes/inputs_seccion_3)
 
 ### 2.2 Codificación de la información de entrada
 
@@ -47,52 +95,38 @@ Con la información introducida a través del archivo excel, nuestro programa ge
 
 * *Disponibilidad_Profesor_Franja~pxt~*, abreviado como **DPF~pxt~**, es una matriz donde el elemento *ij* representa la disponibilidad del profesor *i* en la franja *j*. Vale 1 si el profesor puede dar clase a esa hora o 0 si no puede.
 
-
 ### 2.3 Genotipo
 
-Para representar una posible solución usaremos la matriz **Genotipo~mxt~**, donde el elemento *ij* representa la asignatura asignada a la clase *i* en la franja *j*.
+Para representar cada posible solución usaremos la matriz **Genotipo~mxt~**, donde el elemento *ij* representa la asignatura asignada a la clase *i* en la franja *j*.
 
-Nótese que la solución no especifica qué profesor es asignado para dar una determinada asignatura a una determinada clase. Esto es porque vamos a diseñar el algoritmo de modo que al generar una posible solución, el profesor asignado a cada clase-asignatura sea el correcto. Al fin y al cabo esto es una condición *hard* que hay que cumplir, y permite simplificar la notación y reducir el tamaño del espacio de búsqueda. 
+Nótese que la solución no especifica qué profesor es asignado para dar una determinada asignatura a una determinada clase. Esto es porque vamos a diseñar el algoritmo de modo que al generar una posible solución, el profesor asignado a cada clase-asignatura siempre sea el que corresponde. Al fin y al cabo esto es una condición *hard* que hay que cumplir, y permite simplificar la notación y reducir el tamaño del espacio de búsqueda. 
 
 Asociada a la matriz **Genotipo~mxt~**, en el código también se crea la matriz **Asignatura_Profesor_Franja~pxt~**, abreviado como **APF~pxt~**, en la que el elemento *ij* representa la asignatura asignada al profesor *i* en la franja *j*. Si no hay asignatura asignada, *ij* valdrá 0. Si hay más de una asignatura asignada al profesor *i* en la franja *j*, *ij* valdrá -1. Esta matriz no añade información adicional y se deduce enteramente de la matriz **Genotipo~mxt~**, pero se crea por conveniencia para simplificar ciertos cálculos. 
 
+### 2.3 Inicialización de los individuos
+
+El procedimiento empleado para inicializar un individuo de forma aleatoria es el siguiente:
+
+Mientras (*while*) quede alguna hora de alguna asignatura por asignar a alguna clase, iterar:
+
+|  Para cada clase *c*:
+|    Para cada asignatura *a*:
+|      Si quedan horas por asignar de la asignatura *a* a la clase *c*:
+|        - Se selecciona una franja de una hora aleatoriamente entre todas las franjas pendientes de asignar a *c*
+|        - Se asigna la asignatura *a* a *c* en la franja horaria escogida
+|        - Se actualiza el valor de horas de asignatura *a* pendientes de asignar a la clase *c*
+|        - Se actualiza el valor de franjas de una hora pendientes de asignar a la clase *c*
+
+En *python* cada individuo se crea como una instancia de la clase *Genotipo*. Al inicializar un objeto de tipo *Genotipo*, este ejecuta el método (método en *python* es una función definida dentro de una clase) *generar_genotipo*, que es la función que implementa el procedimiento descrito, devolviendo la matriz *Genotipo~mxt~*´.
+
 ### 2.4 Función de fitness
 
-La función de fitness implementada comprobará si las restricciones hard y soft mencionadas anteriormente se cumplen o no. Para ello, estarán disponibles dos contadores, uno para las restricciones hard y otro para las soft, donde en cada violación de una restricción su respectivo contador se verá incrementado. El coste del individuo será la suma de ambos contadores, sin embargo, dichos contadores serán multiplicados por unos pesos para poder simular que las restricciones hard tienen una importancia superior que las soft.
+La función de fitness comprueba el cumplimiento de las restricciónes que no satisfechas implícitamente. En concreto, las restricciones *hard* 1,3 y 6 y todas las *soft*.
 
-Dicho esto, cuantas más restricciones infrinja, más grande será su valor de fitness, por lo que nos interesará encontrar el individuo con un valor de fitness mínimo, es decir, que será el que menos restricciones infringe.
+Para ello, emplea dos contadores, contador_hard y contador_soft. Cada violación de una restricción incrementa el contador respectivo. El *fitness* final del individuo será la suma de ambos contadores multiplicados por unos pesos que reflejan que las restricciones hard tienen una importancia superior que las soft. En concreto, el multiplicador vale 50 para las restricciones *hard* y 1 para las *soft*.
 
+Estamos por tanto ante un valor de *fitness* que es menor cuanto mejor es la solución (una solución óptima tendrá *fitness* = 0). Ésta no es la interpretación habitual del concepto de valor de *fitness*, que suele ser mayor cuanto mejor sea la solución. Sin embargo, en nuestro caso nos parecía más conveniente hacerlo de así porque de esta manera el valor de *fitness* óptimo está acotado (sabemos que no puede ser inferior a cero) y resulta más sencillo hacerse una idea intutivia de lo buena que es una solución mirando cómo de cerca está una solución de dicho óptimo "teórico" (decimos "teórico" entre comillas porque en realidad, para unos *inputs* determinados, puede que no sea posible encontrar una solución con *fitness* = 0).
 
-## 3. Restricciones
-
-Las restricciones "hard" del algoritmo son las siguientes:
-
-1. No se pueden asignar horas a un profesor fuera de su disponibilidad. Por motivos de conciliación laboral esta restricción debe estar presente y se comprobará comparando con un horario que ha estimado cada profesor. Estos horarios de disponibilidad se encuentran en los inputs tal como se ha visto anteriormente.
-
-1. No se pueden asignar dos asignaturas a la vez a la misma clase. Esta restricción vendrá implícita en la codificación de los individuos ya que en cada franja únicamente se asigna una única asignatura, por lo que no será necesario que se tenga en cuenta para ser evaluada.
-
-1. No se pueden asignar dos clases a la vez al mismo profesor. Esta restricción se deberá tener en cuenta en la evaluación de cada individuo.
-
-1. Se deben asignar el número de horas exacto de las asignaturas a cada clase, ni más ni menos horas. Esta restricción no es necesario que se tenga en cuenta para ser evaluada debido a que esta se cumple a la hora de crear cada uno de los genotipos.
-
-1. Las asignaturas se deben asignar al profesor definido en los inputs aunque haya otros profesores que impartan esa asignatura a otra clase. Esta restricción, tal como se ha explicado anteiormente, vendá implícita en la codificación del genotipo gracias a la matriz *Profesor_Clase_Asignatura~mxn~* implementada.
-
-1. Las clases no pueden tener horas vacías entre medias pero si pueden tener horas vacías al principio y al final de la jornada si el número de horas semanales de esa clase es inferior al número total de horas disponibles.
-
-1. Únicamente se podrá dar clase dentro del horario establecido. Esta restricción se satisfacerá ya que en la codificación de los individuos ya vienen establacidas dichas franjas horarias, por lo que únicamente se podrán asignar horas de asignaturas dentro de las franjas establecidas.
-
-
-Las restricciones "soft" del algoritmo son las siguientes:
-
-1. Los profesores deben tener el menor número de huecos (horas vacías entre medias) posible. 
-
-1. El número de horas impartidas por un profesor deben distribuirse lo más uniformemente posible a lo largo de la semana. Por ejemplo, si un profesor tiene que dar en total 10 horas, es preferible que dé 2 horas cada día a que dé 5 horas en dos días.
-
-1. Si una clase tiene menos horas asignadas que el total de horas lectivas y hay posibilidad de que las asignaturas se concentren de modo que las clases tenga días libres,  está opción es la deseable. Por ejemplo, si la semana lectiva son 25 horas (5 por día) y una clase tiene 20 horas asignadas, es preferible que tengan un día de la semana completamente libre a que tengan una hora libre cada día.
-
-1. Las clases no deben tener la misma asignatura más de una vez en el día.
-
-1. Si el número total de horas libres de una clase es tal que tiene que haber días con horas libres y clase, es mejor que estas horas libres se repartan uniformemente entre todos los días. Por ejemplo, si la semana lectiva son 30 horas (6 por día) y una clase tiene 20 horas asignadas, la clase tiene 10 horas libres. Por la restricción soft #3 es preferible que 6 de esas horas libres se concentren en un día. Pero además, las 4 horas libres restantes es preferible que se repartan entre los otros cuatro días, a que se concentren en un día que tendría 4 horas libres y 2 horas de clase.
 
 ## 4. Algoritmo
 
