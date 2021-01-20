@@ -87,11 +87,11 @@ Las restricciones "soft" del algoritmo son las siguientes:
 
 1. El número de horas impartidas por un profesor deben distribuirse lo más uniformemente posible a lo largo de la semana. Por ejemplo, si un profesor tiene que dar en total 10 horas, es preferible que dé 2 horas cada día a que dé 5 horas en dos días.
 
-1. El número total de periodos vacíos se debe distribuir uniformemente entre los profesores. PROPONGO CARGARNOS ESTA (QUE ES DIFICIL) Y EN SU LUGAR PONER: Si una clase tiene menos horas asignadas que horas hay en el horario lectivo, los espacios sin asignaturas deben estar lo más concentrados posible. Por ejemplo, si la semana lectiva son 25 horas (5 por día) y una clase tiene 20 horas asignadas, es preferible que tengan un día de la semana completamente libre a que tengan una hora libre cada día.
+1. Si una clase tiene menos horas asignadas que el total de horas lectivas y hay posibilidad de que las asignaturas se concentren de modo que las clases tenga días libres,  está opción es la deseable. Por ejemplo, si la semana lectiva son 25 horas (5 por día) y una clase tiene 20 horas asignadas, es preferible que tengan un día de la semana completamente libre a que tengan una hora libre cada día.
 
 1. Las clases no deben tener la misma asignatura más de una vez en el día.
 
-1. ESTA LA PUSE YO PERO CREO QUE ES IGUAL QUE LA ANTERIOR, NO? El número de horas de una clase determinada debe repartirse lo más uniformemente posible (esto aplica en los casos en los que el número de horas semanales de la clase es inferior al número total de horas disponibles).
+1. Si el número total de horas libres de una clase es tal que tiene que haber días con horas libres y clase, es mejor que estas horas libres se repartan uniformemente entre todos los días. Por ejemplo, si la semana lectiva son 30 horas (6 por día) y una clase tiene 20 horas asignadas, la clase tiene 10 horas libres. Por la restricción soft #3 es preferible que 6 de esas horas libres se concentren en un día. Pero además, las 4 horas libres restantes es preferible que se repartan entre los otros cuatro días, a que se concentren en un día que tendría 4 horas libres y 2 horas de clase.
 
 ## 4. Algoritmo
 
