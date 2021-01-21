@@ -1,7 +1,7 @@
 ---
 title: 'Entrega 2: Elaboración de horarios mediante algoritmos evolutivos'
-author: "Juan Miguel Frau y Ramon Rotaeche"
-date: "28/12/2020"
+author: 'Juan Miguel Frau y Ramon Rotaeche' 
+date: "https://github.com/RR-28023/practicaevol"
 output: 
   pdf_document
 ---
@@ -127,7 +127,7 @@ La función de fitness comprueba el cumplimiento de las restricciónes que no sa
 
 Para ello, emplea dos contadores, contador_hard y contador_soft. Cada violación de una restricción incrementa el contador respectivo. El *fitness* final del individuo será la suma de ambos contadores multiplicados por unos pesos que reflejan que las restricciones hard tienen una importancia superior que las soft. En concreto, el multiplicador vale 50 para las restricciones *hard* y 1 para las *soft*.
 
-Estamos por tanto ante un valor de *fitness* que es menor cuanto mejor es la solución (una solución óptima tendrá *fitness* = 0). Ésta no es la interpretación habitual del concepto de valor de *fitness*, que suele ser mayor cuanto mejor sea la solución. Sin embargo, en nuestro caso nos parecía más conveniente hacerlo de así porque de esta manera el valor de *fitness* óptimo está acotado (sabemos que no puede ser inferior a cero) y resulta más sencillo hacerse una idea intutivia de lo buena que es una solución mirando cómo de cerca está una solución de dicho óptimo "teórico" (decimos "teórico" entre comillas porque en realidad, para unos *inputs* determinados, puede que no sea posible encontrar una solución con *fitness* = 0).
+Estamos por tanto ante un **valor de *fitness* que es menor cuanto mejor es la solución** (una solución óptima tendrá *fitness* = 0). Ésta no es la interpretación habitual del concepto de valor de *fitness*, que suele ser mayor cuanto mejor sea la solución. Sin embargo, en nuestro caso nos parecía más conveniente hacerlo de así porque de esta manera el valor de *fitness* óptimo está acotado (sabemos que no puede ser inferior a cero) y resulta más sencillo hacerse una idea intutivia de lo buena que es una solución mirando cómo de cerca está una solución de dicho óptimo "teórico" (decimos "teórico" entre comillas porque en realidad, para unos *inputs* determinados, puede que no sea posible encontrar una solución con *fitness* = 0).
 
 ### 2.6 Selección de padres
 
@@ -167,24 +167,15 @@ El algoritmo se estructura de la siguiente manera:
 
 5. De la población que queda al final de las iteraciones, se selecciona el individuo con menor fitness y esta es la solución final.
 
-Una vez ejecutado, el algoritmo ofrece:
+Una vez ejecutado, el algoritmo ofrece (ver siguiente sección para ejemplos concretos):
 
 - Un gráfico con el fitness del mejor superviviento de cada iteración para poder seguir el proceso.
-
-FALTA PONER IMAGEN
-
 - Número de veces que la solucón final infringe cada una de las restricciones tanto hard como soft.
-
-FALTA PONER IMAGEN
-
 - Dos representaciones gráficas de la solución, la primera muestra el horario desde el punto de vista de las clases y la segunda muestra el horario desde el punto de vista de los profesores, indicando los días en los que no están disponibles e indicando si hay algún solape. Esto se muestra para el mejor individuo en la iteración 1, y para el mejor individuo en la última iteración (es decir, la solución final) 
-
-FALTA PONER IMAGEN
-
 
 ## 3. Pruebas realizadas
 
-Para testear el algoritmo se han utilizado diferentes entradas las cuales se ha ido incrementando en cada una de ellas su dificultad para el algoritmo. Dichas pruebas se han llevado a cabo con un tamaño de la población igual a 500 y con un máximo de 1000 iteraciones.
+Para testear el algoritmo se han utilizado diferentes entradas las cuales se ha ido incrementando en cada una de ellas su dificultad para el algoritmo. Dichas pruebas se han llevado a cabo con un tamaño de la población igual a 500 individuos y con un total de 1000 iteraciones.
 
 Finalmente, añadir que estos son solo algunas de las entradas creadas dentro de la gran posibilidad de entardas que existen, por ello, destacar que un pequeño cambio en este conjunto de datos de entrada puede conllevar grandes cambios en el algoritmo, y consecuentemente resultados totalmente diferentes.
 
@@ -195,11 +186,10 @@ El primer conjunto de inputs utilizado está compuesto por:
 * 11 profesores que únicamente dan una asignatura, una diferente cada uno
 * 4 grupos de clase con el mismo número de horas de clase cada uno
 * 12 asignaturas
-* Todos los profesores tienen una disponibilidad horaria en todas la horas
+* Todos los profesores están disponibles todos los días
 * El horario lectivo es de 8h a 14h toda la semana
 
-
-El resultado obtenido es de un valor de fitness de X. En este caso, no se ha infringido ninguna restricción hard pero si han infringido algunas restricicones soft, X veces la restrccion soft X y X veces la restriccion soft X, propiciando el valor de fitness obtenido.
+El resultado obtenido es de un valor de fitness de 5. En este caso, no se ha infringido ninguna restricción hard pero si han infringido algunas restricicones soft, X veces la restrccion soft X y X veces la restriccion soft X, propiciando el valor de fitness obtenido.
 
 En cuanto a la gráfica (imagen X), se puede apreciar en las primeras iteraciones un descenso rápido en el valor de fitness que se va atenuando siendo más constante a medida que avanzan las iteraciones.
 
@@ -247,28 +237,37 @@ El cuarto conjunto de inputs utilizado está compuesto por:
 
 FALTA PONER IMÁGENES Y RESULTADOS
 
-## 6. Modificaciones del algoritmo
+## 4. Modificaciones del algoritmo
 
-### 6.1 Modificación técnica selección de padres
+En esta sección proponemos una serie de potenciales mejoras para el algoritmo, y comprobamos su efectividad. La efectividad se comprueba comparando el fitness de la solución final con el algoritmo "original", con el fitness de la solución final obtenida tras los cambios aquí descritos. Esta comparación se puede hacer gracias al uso que hacemos en el código de *seeds* junto con librerías de selección aleatoria, que garantizan que la población inicial y las partes del algoritmo no modificadas dan resultados exactamente iguales que en la sección anterior.
 
-Para modificar el algoritmo y comparar si existe una mejora en los resultados se han propuesto dos nuevas ténicas de selección de padres. 
-En primer lugar, se ha implementado un método de selección totalmente aleatorio donde no se tendrá en cuenta el valor de fitness. 
-En segundo lugar, se ha implementado la técnica de selección del muestreo universal estocástico (SUS) desarrollado por James Baker. Esta técnica es similar a la técnica de selección de la ruleta implementada anteriormente. Ambas técnicas utilizan los valores de fitness de los individuos para indicar la probabilidad de que salgan elegidos siendo la porción de la ruleta mayor en el indivduo con mejor fitness, sin embargo, la diferencia que existe entre ambas técnicas es que la técnica de la ruleta realiza *n* tiradas obteniendo cada vez un individuo y la técnica SUS únicamente realiza una tirada donde selecciona a todos los individuos mediante intervalos uniformente repartidos sobre la ruleta.
+### 4.1 Modificaciones en la selección de supervivientes
+
+Se proponen dos nuevas ténicas de selección de supervivientes:
+
+-**Modificación 1**: Selección totalmente aleatoria donde no se tiene en cuenta el valor de fitness. El fitnes de las nuevas soluciones queda:
+
+[PENDIENTE AÑADIR RESULTADOS]
+
+
+-**Modificación 2**: Técnica de selección del muestreo universal estocástico (SUS) desarrollado por James Baker. Esta técnica es similar a la técnica de selección de la ruleta empleada en el algoritmo original. Ambas técnicas utilizan los valores de fitness para definir el tamaño de la "porcíon de la ruleta" que corresponde a cada individuo, de modo que es más probable escoger un individuo con un fitness mejor. Sin embargo, la diferencia que existe entre ambas técnicas es que la técnica de la ruleta realiza *n* tiradas obteniendo cada vez un individuo, mientras que la técnica SUS únicamente realiza una tirada para definir el punto de la ruleta apartir del cual "recorre" la ruleta en intervalos uniformes seleccionando un individuo en cada intervalo. 
+
+[PENDIENTE AÑADIR RESULTADOS]
+
+### 4.2 Modificación operador de recombinación
+
+Se proponen dos nuevas ténicas de reombinación:
+
+-**Modificación 3**: El operador anteriormente implementado elegía de forma aleatoria las clases que que pertenecían a un padre o al otro, sin embargo, este operador realiza la recombinación siempre del mismo modo, la primera mitad de clases serán de un padre y la segunda mitad del otro.
+
+-**Modificación 4**: En este caso se crea un hijo que contiene "lo mejor" de cada padre. Para ello se calcula el *fitness* de cada padre a nivel clase y el *Hijo 1* toma la mejor clase de cada par de clases. Por ejemplo, si el fitness del la *'Clase A'* del *Padre 1* es 38 y el fitness de la 'Clase A' del *Padre 2* es 32, el horario de la *'Clase A'* en el *Hijo 1* será el del *Padre 2*. Con este operador también se crea el *Hijo 2* como complementario del 1, así que en este caso el *Hijo 2* tendrá "lo peor" de cada padre. La limitación de esta modificación es que no se pueden calcular todas las restricciones a nivel clase ya que también está la dimensión profesor (por ejemplo la restricción de que los profesores tengan los huecos distribuidos uniformemente a lo largo de la semana). De hecho, en muchas ocasiones observamos que el fitness total del *Hijo 1* (que se supone que tiene lo mejor de cada padre), es peor que el de cualquiera de los padres, ya que remplazar el horario de una clase por otra impacta negativamente en el fitness del horario semanal del profesor.
+
+### 4.3 Modificación operador de mutación
+
+-**Modificación 5**: En este caso, en lugar de elegir una clase y una franja aleatoriamente para permutar por otra, la selección de la clase sigue siendo aleatoria pero dentro de la clase se elige una franja en el "peor día" (dentro de ese día la selección es aleatoria). Para ello se calcula el *fitness* a nivel día para la clase seleccionada. La limitación de esta modificación es que no se pueden calcular todas las restricciones a nivel clase-día ya que muchas son a nivel profesor y otras a nivel semana (por ejemplo la de tener huecos uniformemente distribuidos). 
+
+
+[PENDIENTE AÑADIR RESULTADOS]
+
 
 FALTA PONER RESULTADOS
-
-### 6.2 Modificación operador de recombinación
-
-Por otro lado, se ha propuesto un nuevo operador de recombinación. El operador anteriormente implementado elegía de forma aleatoria las clases que que pertenecían a un padre o al otro, sin embargo, este operador realiza la recombinación siempre del mismo modo, la primera mitad de clases serán de un padre y la segunda mitad del otro.
-
-FALTA PONER RESULTADOS
-
-$$
-\textit{Formula} = 
-  \sum_{\textit{i}=\textit{xxx}}^{\textit{yyy}}
-  \frac
-    {\textit{ZZZ}_{\textit{i}}}
-    {\textit{MMM}_{i}^
-      {\text{NN}_{\textit{i}}}
-    }
-$$
