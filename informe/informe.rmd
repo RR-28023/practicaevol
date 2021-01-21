@@ -2,7 +2,8 @@
 title: 'Entrega 2: Elaboración de horarios mediante algoritmos evolutivos'
 author: "Juan Miguel Frau y Ramon Rotaeche"
 date: "28/12/2020"
-output: pdf_document
+output: 
+  pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -13,13 +14,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 El objetivo de esta entrega es implementar un algoritmo evolutivo para la elaboración de  horarios  en  un  centro  educativo. Para ello:
 
-a) Estableced cuáles son las restricciones soft y hard de vuestro algoritmo y justificadlas.
+1) Estableced cuáles son las restricciones soft y hard de vuestro algoritmo y justificadlas.
 
-b) Explicad claramente cuál es la codificación usada, cuáles son los parámetros del algoritmo y su función de fitness. Justificad su elección.
+2) Explicad claramente cuál es la codificación usada, cuáles son los parámetros del algoritmo y su función de fitness. Justificad su elección.
 
-c) Cread varias entradas con distintos grados de dificultad y analizad los resultados obtenidos.Podéis utilizar como entrada listas de asignaturas y sus horas semanales de distintos cursos de secundaria y bachillerato.
+3) Cread varias entradas con distintos grados de dificultad y analizad los resultados obtenidos.Podéis utilizar como entrada listas de asignaturas y sus horas semanales de distintos cursos de secundaria y bachillerato.
 
-d) Proponed alguna modificación al algoritmo y analizad los resultados obtenidos. Esta modificación puede ser un nuevo operador de mutación o recombinación,una nueva estrategia de selección de los individuos de la nueva generaciónm, etc.
+4) Proponed alguna modificación al algoritmo y analizad los resultados obtenidos. Esta modificación puede ser un nuevo operador de mutación o recombinación,una nueva estrategia de selección de los individuos de la nueva generaciónm, etc.
 
 
 ## 1. Restricciones *hard* y *soft*
@@ -55,7 +56,7 @@ Las **restricciones *soft*** del algoritmo son las siguientes:
 1. Si el número total de horas libres semanales de una clase es tal que tiene que haber **días que combinen horas libres y clase, es mejor que estas horas libres se repartan uniformemente entre todos los días**. Por ejemplo, si la semana lectiva son 30 horas (6 por día) y una clase tiene 20 horas asignadas, la clase tiene 10 horas libres. Por la restricción *soft* #3 es preferible que 6 de esas horas libres se concentren en un día. Pero además, las 4 horas libres restantes es preferible que se repartan entre los otros cuatro días, a que se concentren en un día que tendría 4 horas libres y 2 horas de clase. Esta restricción se tiene en cuenta mediante la función de *fitness*.
 
 
-## 2. Codificación empleada
+## 2. Codificación y algoritmo empleados
 
 ### 2.1 Información de entrada
 
@@ -70,6 +71,7 @@ En la sección 1 se introduce, para cada clase, el número de horas semanales po
 ![Generador inputs horarios: Sección 1](imagenes/inputs_seccion_1)
 
 En la sección 2 se introduce la disponibilidad de los profesores a lo largo de la semana. Para reducir los grados de libertad, se introduce a nivel día (en lugar de a nivel hora). Es decir, si los profesores están disponibles un día, lo están a cualquier hora del horario lectivo de ese día. Y viceversa, si no están disponibles, no lo están para ninguna hora de ese día.
+\newpage
 
 ![Generador inputs horarios: Sección 2](imagenes/inputs_seccion_2)
 
@@ -97,13 +99,13 @@ Con la información introducida a través del archivo excel, nuestro programa ge
 
 ### 2.3 Genotipo
 
-Para representar cada posible solución usaremos la matriz **Genotipo~mxt~**, donde el elemento *ij* representa la asignatura asignada a la clase *i* en la franja *j*.
+Para representar cada posible solución (i.e. cada individuo) usaremos la matriz **Genotipo~mxt~**, donde el elemento *ij* representa la asignatura asignada a la clase *i* en la franja *j*.
 
 Nótese que la solución no especifica qué profesor es asignado para dar una determinada asignatura a una determinada clase. Esto es porque vamos a diseñar el algoritmo de modo que al generar una posible solución, el profesor asignado a cada clase-asignatura siempre sea el que corresponde. Al fin y al cabo esto es una condición *hard* que hay que cumplir, y permite simplificar la notación y reducir el tamaño del espacio de búsqueda. 
 
 Asociada a la matriz **Genotipo~mxt~**, en el código también se crea la matriz **Asignatura_Profesor_Franja~pxt~**, abreviado como **APF~pxt~**, en la que el elemento *ij* representa la asignatura asignada al profesor *i* en la franja *j*. Si no hay asignatura asignada, *ij* valdrá 0. Si hay más de una asignatura asignada al profesor *i* en la franja *j*, *ij* valdrá -1. Esta matriz no añade información adicional y se deduce enteramente de la matriz **Genotipo~mxt~**, pero se crea por conveniencia para simplificar ciertos cálculos. 
 
-### 2.3 Inicialización de los individuos
+### 2.4 Inicialización de los individuos
 
 El procedimiento empleado para inicializar un individuo de forma aleatoria es el siguiente:
 
@@ -119,7 +121,7 @@ Mientras (*while*) quede alguna hora de alguna asignatura por asignar a alguna c
 
 En *python* cada individuo se crea como una instancia de la clase *Genotipo*. Al inicializar un objeto de tipo *Genotipo*, este ejecuta el método (método en *python* es una función definida dentro de una clase) *generar_genotipo*, que es la función que implementa el procedimiento descrito, devolviendo la matriz *Genotipo~mxt~*´.
 
-### 2.4 Función de fitness
+### 2.5 Función de fitness
 
 La función de fitness comprueba el cumplimiento de las restricciónes que no satisfechas implícitamente. En concreto, las restricciones *hard* 1,3 y 6 y todas las *soft*.
 
@@ -127,113 +129,66 @@ Para ello, emplea dos contadores, contador_hard y contador_soft. Cada violación
 
 Estamos por tanto ante un valor de *fitness* que es menor cuanto mejor es la solución (una solución óptima tendrá *fitness* = 0). Ésta no es la interpretación habitual del concepto de valor de *fitness*, que suele ser mayor cuanto mejor sea la solución. Sin embargo, en nuestro caso nos parecía más conveniente hacerlo de así porque de esta manera el valor de *fitness* óptimo está acotado (sabemos que no puede ser inferior a cero) y resulta más sencillo hacerse una idea intutivia de lo buena que es una solución mirando cómo de cerca está una solución de dicho óptimo "teórico" (decimos "teórico" entre comillas porque en realidad, para unos *inputs* determinados, puede que no sea posible encontrar una solución con *fitness* = 0).
 
+### 2.6 Selección de padres
 
-## 4. Algoritmo
+Para realizar la selección de padres se emplea el método de selección por torneo. Para ello, se divide la población en *n* grupos aleatorios. De cada grupo, se como padre el individuo que tiene menor valor de fitness.
 
-El algoritmo se estructura de la siguiente manera [COMPLETAR cuando lo tengamos]
+El número de grupos *n* es el número de padres que se seleccionan. El algoritmo compúta el número de padres (*num_padres*) como un quinto de la población total (*n = num_padres = int(tam_población/5)*).
 
-```
-def ejecutar_algoritmo(n_iter, tam_pop):
-    '''
-    Función principal para ejecutar todos los pasos e iteraciones del algoritmo evolutivo. No devuelve ningún objeto.
-    :param n_iter: número de iteraciones
-    :param tam_pop: tamaño de la población
-    '''
-    inputs = codificar_inputs()
-    poblacion = inicializar_poblacion(inputs, tam_pop)
-    for i in range(n_iter):
-        padres = seleccionar_padres(poblacion, tam_pop)
-        recombinar_padres()
-        mutar_individuos()
-        poblacion = seleccionar_supervivientes(poblacion, tam_pop)
-    solucion = seleccionar_solucion(poblacion)
-    solucion.plot_genotipo()
-```
+### 2.7 Recombinación de padres
 
-### 4.1 Inicialización de los genotipos
-
-El procedimiento que empleamos para inicializar un genotipo de forma aleatoria es:
-
-Mientras quede alguna hora de alguna asignatura por asignar a una clase:
-  Para cada clase *i*:
-    Para cada asignatura j:
-      Si el número de horas pendientes de asignar a la clase *i* de la asignatura *j* es > 0:
-        1. Escoger un número de franja al azar entre las franjas disponibles para la clase *i*.
-        2. Asignar la asignatura *j* a esa franja horaria
-        3. Eliminar la franja seleccionada de la lista de franjas disponibles para la clase *i*.
-        4. Restar 1 al número de horas pendientes de asignar a la clase *i* de la asignatura *j*.
-
-
-### 4.2 Función de fitness
-
-A continuación, se puede observar el código implementado para el cálculo del valor de fitness de un individuo donde se recorre todo la matriz que conforma el genotipo buscando las restricciones establecidas. Así pues, las restricciones anteriormente mencionadas que serán evaluadas en la función de fitness serán:
-
-* Restricciones hard 1, 3 y 6.
-* Restricciones soft 1, 2, 3, 4 y 5.
-
-```
-Insertar código
-```
-
-### 4.3 Selección de padres
-
-Para realizar la selección de padres se ha llevado a cabo el método de selección por torneo. Para ello, se han desordenado los individuos para añadir aletoriedad a la selección y se han formado *n* grupos formados por *k* individuos. De cada grupo, se ha seleccionado como padre el individuo que tiene menor valor de fitness.
-
-
-```
-Insertar código
-```
-
-### 4.4 Recombinación
-
-Para realizar la recombinación, se toman dos individuos (*Padre 1* y *Padre 2*) y, siendo *n* el número total de clases, se seleccionan aleatoriamente *n/2* clases del *Padre 1* (*n/2 - 0.5* si *n* es impar) y las *n/2* clases complementarias del *Padre 2* (*n/2 + 0.5* si *n* es impar) combinándolas en un nuevo individuo, el *Hijo 1*. Por otro lado, las clases no seleccionadas de *Padre 1* y *Padre 2* se combinan para generar otro individuo adicional, el *Hijo 2*.
+Para realizar la recombinación, se toman dos individuos (*Padre 1* y *Padre 2*) y, siendo *n* el número total de clases, se seleccionan aleatoriamente *n/2* clases del *Padre 1* (*n/2 - 0.5* si *n* es impar) y las clases complementarias del *Padre 2*  combinándolas en un nuevo individuo, el *Hijo 1*. Por otro lado, las clases no seleccionadas de *Padre 1* y *Padre 2* se combinan para generar otro individuo adicional, el *Hijo 2*.
 
 Por ejemplo, si hay cuatro clases ('Clase A', 'Clase B', Clase C' y 'Clase D'). Una combinación posible sería formar el *Hijo 1* con la 'Clase A' y la 'Clase D' del *Padre 1*, y la 'Clase B' y la 'Clase C' del *Padre 2*. Mientras que el *Hijo 2* estaría formado por la 'Clase B' y la 'Clase C' del *Padre 1*, y la Clase A' y la 'Clase D' del *Padre 2*. 
 
-```
-Insertar código
-```
+### 2.8 Mutación
 
-### 4.5 Mutación
+La mutación consiste en permutar dos franjas horarias del horario. Sin embargo, debido a las restricciones realizadas y la codificación inicial especificada, no será posible permutar a nivel de genotipo, sino que se realizará en una de las clases para evitar que una clase tenga una asignatura que no le pertenece. Por ello, en primer lugar, se selecciona una clase de forma aleatoria y, seguidamente, se seleccionan aleatoriamente dos franjas del horario de dicha clase se intercambian la posición.
 
-La mutación consistirá en permutar dos franjas horarias del horario. Sin embargo, debido a las restricciones realizadas y la codificación inicial especificada, no será posible permutar a nivel de genotipo, sino que se realizará en una de las clases para evitar que una clase tenga una asignatura que no le pertenece. Por ello, en primer lugar, se obtendrá una clase de forma aleatoria y, seguidamente, se elegirán dos franjas del horario de dicha clase de forma aleatoria y se intercambiarán la posición.
-
-
-```
-Insertar código
-```
-
-### 4.6 Selección de supervivientes
+### 2.9 Selección de supervivientes
 
 Para realizar la selección de supervivientes en la población de individuos se ha utilizado el método de la ruleta.
 El método de la ruleta consiste en dotar a cada individuo de una probabilidad proporcional a su valor de fitness donde el indiviuo con mejor valor de fitness, que será el individuo que tenga el valor mínimo, tendrá más probabilidades de ser elegido. Una vez establecidas las probabilidades se realizarán *n* tiradas a la ruleta, donde *n* será el tamaño de la población estimada al inicio, y se obtendrán los supervivientes elegidos de forma aleatoria.
 
-```
-Insertar código
-```
+### 2.10. Estructura general del algoritmo y salidas
 
-### Salidas del algoritmo
+La ejecución del algoritmo, implementado en *python* mediante la función *ejecutar_algoritmo* (en main.py), toma como *inputs* tres parámetros: el número de iteraciones (*n_iter*), el tamaño de la población (*tam_pop*) y la *seed* empleada en las selecciones aleatorias (*seed*). Este último parámetro permite generar exactamente el mismo conjunto de soluciones en cada iteración si el resto de información de entrada es igual, por lo que es muy útil para medir el efecto de potenciales mejoras en el algoritmo.
 
-El algoritmo implementado ofrece de forma visual el fitness del mejor superviviento de cada iteración para poder seguir el proceso.
+El algoritmo se estructura de la siguiente manera:
+
+1. Se cálcula el número de padres (*n_padres*) como *num_padres = int(tam_población/5)*.
+2. Se extrae la información del excel y se codifican los inputs como se describe en la sección 2.2.
+3. Se inicializa la población como se describe en la sección 2.3 (la función de inicialización toma como parámetros los inputs codificados y la variable *tam_pop*), devolviendo una lista de objetos conteniendo todos los individuos pertenecientes a la población.
+4. Para cada iteración:
+| 4.1 Se seleccionan los padres de la población
+| 4.2 Se expande la población con el resultado de recombinar a los padres
+| 4.3 Se expande la población con el resultado de mutar a los padres
+| 4.4 Se seleccionan los supervivientes, que pasan a formar la nueva población
+
+5. De la población que queda al final de las iteraciones, se selecciona el individuo con menor fitness y esta es la solución final.
+
+Una vez ejecutado, el algoritmo ofrece:
+
+- Un gráfico con el fitness del mejor superviviento de cada iteración para poder seguir el proceso.
 
 FALTA PONER IMAGEN
 
-Ofrece, una vez finalizado, el número de veces qu el inididuo final infringe cada una de las restricciones tanto hard como soft.
+- Número de veces que la solucón final infringe cada una de las restricciones tanto hard como soft.
 
 FALTA PONER IMAGEN
 
-Y, finalmente, se ofrece de forma visual el horario de cada una de las clases y de cada uno de los profesores. Esto se muestra para el mejor indivduo inicial y el individuo final para poder comparar los cambios sucedidos durante el algoritmo.
+- Dos representaciones gráficas de la solución, la primera muestra el horario desde el punto de vista de las clases y la segunda muestra el horario desde el punto de vista de los profesores, indicando los días en los que no están disponibles e indicando si hay algún solape. Esto se muestra para el mejor individuo en la iteración 1, y para el mejor individuo en la última iteración (es decir, la solución final) 
 
 FALTA PONER IMAGEN
 
 
-## 5. Pruebas realizadas
+## 3. Pruebas realizadas
 
-Para testear el algoritmo se han utilizado diferentes entradas las cuales se ha ido incrementando en cada una de ellas su dificultad para el algoritmo. Dichas pruebas se han llevado a cabo con un tamaño de la población igual a 500 y con un máximo de 1000 iteraciones. Además, se ha estimado que el número de padres que se elegirán será 1/5 de la población total.
+Para testear el algoritmo se han utilizado diferentes entradas las cuales se ha ido incrementando en cada una de ellas su dificultad para el algoritmo. Dichas pruebas se han llevado a cabo con un tamaño de la población igual a 500 y con un máximo de 1000 iteraciones.
 
 Finalmente, añadir que estos son solo algunas de las entradas creadas dentro de la gran posibilidad de entardas que existen, por ello, destacar que un pequeño cambio en este conjunto de datos de entrada puede conllevar grandes cambios en el algoritmo, y consecuentemente resultados totalmente diferentes.
 
-### 5.1 Entrada 1
+### 3.1 Entrada 1
 
 El primer conjunto de inputs utilizado está compuesto por:
 
@@ -254,7 +209,7 @@ Sobre la imagen X que compara los horarios de los profesores entre el mejor indi
 
 FALTA PONER IMÁGENES Y RESULTADOS
 
-### 5.2 Entrada 2
+### 3.2 Entrada 2
 
 El segundo conjunto de inputs utilizado es prácticamente igual al anterior con la única diferencia de que en este caso los profesores no tienen un disponibilidad horaria completo por lo que habrá días en los que no podrán ejercer.
 
@@ -264,7 +219,7 @@ Ver en las imágenes X y X como, además de todas las mejoras vistas en la entra
 
 FALTA PONER IMÁGENES Y RESULTADOS
 
-### 5.3 Entrada 3
+### 3.3 Entrada 3
 
 El tercer conjunto de inputs utilizado está compuesto por:
 
@@ -280,7 +235,7 @@ Además, indicar, tal como se ve en la imagen X, como al ser menos profesores qu
 
 FALTA PONER IMÁGENES Y RESULTADOS
 
-### 5.4 Entrada 4
+### 3.4 Entrada 4
 
 El cuarto conjunto de inputs utilizado está compuesto por:
 
