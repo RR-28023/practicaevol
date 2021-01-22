@@ -10,6 +10,8 @@ class genotipo():
         self.inputs = inputs
         self.cod = self.generar_genotipo()
         self.apf = self.generar_horario_profesores() # Matriz AsignaturaProfesorFranja
+        self.fitness_clases = [] # Para modificación 4
+        self.fitness_clases_dia = []
         self.fitness = self.calcular_fitness()
 
     def generar_genotipo(self):
@@ -60,9 +62,17 @@ class genotipo():
 
         contador_hard = np.zeros(3)
         contador_soft = np.zeros(5)
-        tot_horas_clase = self.inputs['horas_clase']
+        contador_hard_clases = [] # Para modificaciones de apartado 4
+        contador_soft_clases = [] # Para modificaciones de apartado 4
+        contador_hard_clases_dia = [] # Para modificaciones de apartado 4
+        contador_soft_clases_dia = [] # Para modificaciones de apartado 4
 
         for i, clase in enumerate(self.inputs['clases']):
+
+            contador_hard_clases.append(0)
+            contador_soft_clases.append(0)
+            contador_hard_clases_dia.append([])
+            contador_soft_clases_dia.append([])
 
             for j, franja in enumerate(self.inputs['franjas']):
                 asign = self.cod[i][j] -1
@@ -71,6 +81,7 @@ class genotipo():
                     profesor_asign = self.inputs['PCA'][i][asign]
                     if self.inputs['DPF'][profesor_asign - 1][j] == 0:
                         contador_hard[0] += 1
+                        contador_hard_clases[i] += 1
 
                     # restriccion hard 3 (dos asignaturas a la vez mismo profesor)
                     profesores_otras_clases = []
@@ -79,12 +90,18 @@ class genotipo():
                             profesores_otras_clases.append(self.inputs['PCA'][c][self.cod[c][j]-1])
                     if profesor_asign in profesores_otras_clases:
                         contador_hard[1] += 1
+                        contador_hard_clases[i] += 1
 
             horas_acum = 0
             dias_libres = 0
             max_dias_libres = self.inputs['max_dias_libres'][i]
             rep_huecos_clase = [0]*5
+
             for ndia in range(5):
+
+                contador_hard_clases_dia[i].append(0)
+                contador_soft_clases_dia[i].append(0)
+
                 horas_en_dia = self.inputs['horas_por_dia'][ndia]
                 asig_dia = self.cod[i][horas_acum:horas_acum+horas_en_dia]
                 dias_libres += 0 if sum(a != 0 for a in asig_dia) > 0 else 1
@@ -95,24 +112,27 @@ class genotipo():
                 i_ultima_asign = next((i for i, asig in reversed(list(enumerate(asig_dia))) if asig != 0),len(asig_dia))
                 huecos = asig_dia[i_primera_asign:i_ultima_asign + 1].count(0)
                 contador_hard[2] += 1*huecos
+                contador_hard_clases_dia[i][ndia] += 1*huecos
+                contador_hard_clases[i] += 1*huecos
 
                 # restriccion soft 4 (misma asignatura en el día) - Penaliza más si hay más asignaturas repes
                 n_repeticiones = len(asig_dia) - len(set(asig_dia) - {0}) - asig_dia.count(0)
                 if n_repeticiones != 0:
                     contador_soft[3] += 1 * n_repeticiones
+                    contador_soft_clases_dia[i][ndia] += 1 * n_repeticiones
+                    contador_soft_clases[i] += 1 * n_repeticiones
 
                 horas_acum += horas_en_dia
 
             # restricción soft 3 (maximo número de días libres)
             contador_soft[2] += (max_dias_libres - dias_libres)
+            contador_soft_clases[i] += (max_dias_libres - dias_libres)
 
             # restricción soft 5 (huecos en días no libres clases mejor repartidos)
             rep_huecos_clase = sorted(rep_huecos_clase, reverse=True)
             rep_ideal_clase = self.inputs['reparto_ideal_huecos_clases'][i]
             contador_soft[4] += sum(np.abs([r1 - r2 for (r1, r2) in zip(rep_ideal_clase, rep_huecos_clase)]))
-
-
-
+            contador_soft_clases[i] += sum(np.abs([r1 - r2 for (r1, r2) in zip(rep_ideal_clase, rep_huecos_clase)]))
 
         for p in range(len(self.inputs['profesores'])):
             rep_huecos_profe = [0] * 5  # Reparto de horas libre por día
@@ -137,8 +157,6 @@ class genotipo():
             if sum(np.abs([r1 - r2 for (r1,r2) in zip(rep_ideal_profe, rep_huecos_profe)])) > 0:
                 contador_soft[1] += 1
 
-
-
         if display == True:
             print("Solución - Restricción hard ", 1, ":", contador_hard[0])
             print("Solución - Restricción hard ", 3, ":", contador_hard[1])
@@ -146,12 +164,24 @@ class genotipo():
             for i, r in enumerate(contador_soft):
                 print("Solución - Restricción soft", i+1, ":", r)
 
+            print("Solución - contador_hard_clases_dia: ", contador_hard_clases_dia)
+            print("Solución - contador_soft_clases_dia: ", contador_soft_clases_dia)
+
+            print("Solución - contador_hard_clases: ", contador_hard_clases)
+            print("Solución - contador_soft_clases: ", contador_soft_clases)
+
         peso_rhard = 50
         peso_rsoft = 1
         contador_hard = int(np.sum(contador_hard))
         contador_soft = int(np.sum(contador_soft))
 
         fitness = peso_rhard*contador_hard + peso_rsoft*contador_soft
+        self.fitness_clases = [peso_rhard*h + peso_rsoft*s for h,s in zip(contador_hard_clases, contador_soft_clases)]
+        fitness_clases_dias = []
+        for h,s in zip(contador_hard_clases_dia, contador_soft_clases_dia):
+            out = [hdia*peso_rhard + sdia*peso_rsoft for hdia,sdia in zip(h, s)]
+            fitness_clases_dias.append(out)
+        self.fitness_clases_dia = fitness_clases_dias
         return fitness
 
     def plot_genotipo(self):
@@ -251,6 +281,23 @@ def mutar_genotipo(genotipo_a_mutar: genotipo):
     genotipo_mutado.fitness = genotipo_mutado.calcular_fitness()
     return genotipo_mutado
 
+def mutar_genotipo_mod5(genotipo_a_mutar: genotipo):
+    fitness_clase_dia = genotipo_a_mutar.fitness_clases_dia
+    n, m = np.shape(genotipo_a_mutar.cod)
+    posn = random.randint(0, n-1)
+    fitness_dia = fitness_clase_dia[posn]
+    dia_peor_fitness = fitness_dia.index(max(fitness_dia))
+    dia_peor_start_franja = sum(genotipo_a_mutar.inputs['horas_por_dia'][:dia_peor_fitness])
+    dia_peor_end_franja = sum(genotipo_a_mutar.inputs['horas_por_dia'][:dia_peor_fitness+1])
+    pos1m = random.randint(dia_peor_start_franja, dia_peor_end_franja-1) # Se selecciona una franja del peor día
+    pos2m = random.randint(0, m-1)
+    genotipo_mutado = copy.deepcopy(genotipo_a_mutar)
+    value = genotipo_mutado.cod[posn][pos1m]
+    genotipo_mutado.cod[posn][pos1m] = genotipo_mutado.cod[posn][pos2m]
+    genotipo_mutado.cod[posn][pos2m] = value
+    genotipo_mutado.fitness = genotipo_mutado.calcular_fitness()
+    return genotipo_mutado
+
 def recombinar_genotipos(padre1: genotipo, padre2: genotipo):
     n_clases = len(padre1.cod)
     clases_idx = [i for i in range(n_clases)]
@@ -265,8 +312,9 @@ def recombinar_genotipos(padre1: genotipo, padre2: genotipo):
     hijo1.fitness = hijo1.calcular_fitness()
     hijo2.fitness = hijo2.calcular_fitness()
 
-    """
-    #Otra posible propuesta de recombinación
+    return hijo1, hijo2
+
+def recombinar_genotipos_mod3(padre1: genotipo, padre2: genotipo):
     n_clases = len(padre1.cod)
     mitad = int(n_clases / 2)
     hijo1, hijo2 = copy.deepcopy(padre1), copy.deepcopy(padre2)
@@ -277,5 +325,33 @@ def recombinar_genotipos(padre1: genotipo, padre2: genotipo):
 
     hijo1.fitness = hijo1.calcular_fitness()
     hijo2.fitness = hijo2.calcular_fitness()
-    """
+
+    return hijo1, hijo2
+
+def recombinar_genotipos_mod4(padre1: genotipo, padre2: genotipo):
+    '''
+    Hijo 1 es el resultado de combinar las mejores clases de padre 1 y padre 2. Hijo 2 es el complementario.
+    '''
+
+    n_clases = len(padre1.cod)
+    fitness_clases = padre1.fitness_clases + padre2.fitness_clases
+    idx_sorted = sorted(range(n_clases*2), key=lambda i: fitness_clases[i])
+    idx_top_nclases = idx_sorted[:n_clases]
+    idx_bottom_nclases = idx_sorted[n_clases:]
+
+    hijo1, hijo2 = copy.deepcopy(padre1), copy.deepcopy(padre2)
+
+    for idx in idx_top_nclases:
+        clase = idx if idx < n_clases else  idx - n_clases
+        padre = 1 if idx < n_clases else 2
+        hijo1.cod[clase] = padre1.cod[clase] if padre == 1 else padre2.cod[clase]
+
+    for idx in idx_bottom_nclases:
+        clase = idx if idx < n_clases else idx - n_clases
+        padre = 1 if idx < n_clases else 2
+        hijo2.cod[clase] = padre1.cod[clase] if padre == 1 else padre2.cod[clase]
+
+    hijo1.fitness = hijo1.calcular_fitness()
+    hijo2.fitness = hijo2.calcular_fitness()
+
     return hijo1, hijo2

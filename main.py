@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 from inputs import codificar_inputs
-from genotipo import genotipo, mutar_genotipo, recombinar_genotipos
+from genotipo import genotipo, mutar_genotipo, recombinar_genotipos, recombinar_genotipos_mod3, \
+    recombinar_genotipos_mod4, mutar_genotipo_mod5
 
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
@@ -30,21 +31,20 @@ def seleccionar_supervivientes(poblacion, tam_pop):
     fitness_mejor_superviviente = sorted(supervivientes, key=operator.attrgetter('fitness'), reverse=False)[0].fitness
     return supervivientes, fitness_mejor_superviviente
 
-    '''
+def seleccionar_supervivientes_mod1(poblacion, tam_pop):
     #Otra posible propuesta de método de selección.
     #Selección totalmente aleatoria
-    
-    poblacion_ordenada = sorted(poblacion, key=operator.attrgetter('fitness'), reverse=False)
     supervivientes = np.random.choice(poblacion, tam_pop, replace=False)
     supervivientes = supervivientes.tolist()
     fitness_mejor_superviviente = sorted(supervivientes, key=operator.attrgetter('fitness'), reverse=False)[0].fitness
     return supervivientes, fitness_mejor_superviviente
-    '''
 
-    '''
-    #Otra posible propuesta de método de selección.
-    #Algoritmo SUS (Stochastic Universal Sampling) de James Baker
 
+def seleccionar_supervivientes_mod2(poblacion, tam_pop):
+    '''
+    Otra posible propuesta de método de selección.
+    Algoritmo SUS (Stochastic Universal Sampling) de James Baker
+    '''
     poblacion_ordenada = sorted(poblacion, key=operator.attrgetter('fitness'), reverse=False)
     peor_valor_fitness = poblacion_ordenada[len(poblacion_ordenada)-1].fitness + 1
     ruleta = []
@@ -63,7 +63,6 @@ def seleccionar_supervivientes(poblacion, tam_pop):
 
     fitness_mejor_superviviente = sorted(supervivientes, key=operator.attrgetter('fitness'), reverse=False)[0].fitness
     return supervivientes, fitness_mejor_superviviente
-    '''
 
 def seleccionar_padres(poblacion,tam_pop, num_padres):
     '''
@@ -80,19 +79,25 @@ def seleccionar_padres(poblacion,tam_pop, num_padres):
 
     return padres_seleccionados
 
-def recombinar_padres(poblacion, padres):
+def recombinar_padres(poblacion, padres, n_iteracion):
     nueva_poblacion = poblacion
     n_padres = len(padres)
     padres_shuffled = random.sample(padres, n_padres)
     mitad = int(n_padres/2)
     for padre1, padre2 in zip(padres_shuffled[0:mitad],padres_shuffled[mitad:n_padres]):
-        nueva_poblacion.extend((recombinar_genotipos(padre1, padre2)))
+        if n_iteracion % 2 == 0:
+            nueva_poblacion.extend((recombinar_genotipos(padre1, padre2)))
+        else:
+            nueva_poblacion.extend((recombinar_genotipos_mod4(padre1, padre2)))
     return nueva_poblacion
 
-def mutar_individuos(poblacion, padres):
+def mutar_individuos(poblacion, padres, n_iteracion):
     nueva_poblacion = poblacion
     for padre in padres:
-        nueva_poblacion.append(mutar_genotipo(padre))
+        if n_iteracion % 2 == 0:
+            nueva_poblacion.append(mutar_genotipo(padre))
+        else:
+            nueva_poblacion.append(mutar_genotipo_mod5(padre))
     return nueva_poblacion
 
 def seleccionar_solucion(poblacion):
@@ -108,7 +113,7 @@ def plot_fitness_iteraciones(valores_mejor_fitness):
             s= valores_mejor_fitness[-1], color = 'black')
     plt.show()
 
-def ejecutar_algoritmo(n_iter, tam_pop, seed):
+def ejecutar_algoritmo(n_iter, tam_pop, seed, filepath=None):
     '''
     Función principal para ejecutar todos los pasos e iteraciones del algoritmo evolutivo. No devuelve ningún objeto.
     :param n_iter: número de iteraciones
@@ -117,7 +122,7 @@ def ejecutar_algoritmo(n_iter, tam_pop, seed):
     random.seed(seed)
     np.random.seed(seed)
     num_padres = int(tam_pop / 5) #Se seleccionarán una quinta parte de la población
-    inputs = codificar_inputs()
+    inputs = codificar_inputs(filepath)
     poblacion = inicializar_poblacion(inputs, tam_pop)
     mejores_fit = []
     for i in range(n_iter):
@@ -127,8 +132,8 @@ def ejecutar_algoritmo(n_iter, tam_pop, seed):
             mejor_individuo_inicial.plot_horario_profesores()
 
         padres = seleccionar_padres(poblacion, tam_pop, num_padres)
-        poblacion =  recombinar_padres(poblacion, padres)
-        poblacion = mutar_individuos(poblacion, padres)
+        poblacion =  recombinar_padres(poblacion, padres, i)
+        poblacion = mutar_individuos(poblacion, padres, i)
         poblacion, fit_mejor_sup = seleccionar_supervivientes(poblacion, tam_pop)
         print("Fitness mejor superviviente en iteración {0}: {1}".format(i + 1,fit_mejor_sup))
         mejores_fit.append(fit_mejor_sup)
@@ -145,6 +150,11 @@ def ejecutar_algoritmo(n_iter, tam_pop, seed):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
-    ejecutar_algoritmo(n_iter=1000, tam_pop=500, seed=42)
-    pass
+    archivos = ['.\\datos\\Generador inputs horarios 1.xlsx',
+                '.\\datos\\Generador inputs horarios 2.xlsx',
+                '.\\datos\\Generador inputs horarios 3.xlsx',
+                '.\\datos\\Generador inputs horarios 4.xlsx']
+
+    for archivo in archivos:
+        ejecutar_algoritmo(n_iter=1000, tam_pop=500, seed=42, filepath=archivo)
 

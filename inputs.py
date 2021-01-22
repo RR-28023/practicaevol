@@ -2,9 +2,9 @@ import pandas as pd
 import numpy as np
 
 
-def codificar_inputs():
+def codificar_inputs(filepath=None):
     inputs_codificados = {}
-    clases_df, profes_df, horas_df = extraer_inputs()
+    clases_df, profes_df, horas_df = extraer_inputs(filepath=filepath) if filepath else extraer_inputs()
     clases, asignaturas, profesores, franjas = \
         generar_clases_asignaturas_profesores_franjas(clases_df, profes_df, horas_df)
     HCA, PCA = generar_HCA_PCA(clases_df, clases, asignaturas, profesores)
@@ -41,7 +41,7 @@ def codificar_inputs():
 
     return inputs_codificados
 
-def extraer_inputs(filepath='.\\datos\\Generador inputs horarios 1.xlsx'):
+def extraer_inputs(filepath='.\\datos\\Generador inputs horarios 4.xlsx'):
     '''
     Extrae inputs del excel, eliminando filas y columnas vacías.
     Devuelve tres dataframes
