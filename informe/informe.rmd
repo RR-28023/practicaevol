@@ -336,6 +336,8 @@ Como se puede observar, no hay ninguna modificación que consistentemente supere
 
 Una pregunta interesante es cómo de dependientes son estos resultados de la población inicial generada de forma aleatoria. Si realizamos  el mismo análisis pero con otra *seed*, obtenemos los siguientes resultados.
 
+\newpage
+
 ![Fitness de la solución final obtenida tras aplicar las diferentes modificaciones, seed 33](imagenes/comparativa_mod_seed33.png)
 
 Se puede observar como la modificación 2 sigue siendo la que mejor resultados dá. Aunque en este caso la modificación 3 también supera al algorimto original.
