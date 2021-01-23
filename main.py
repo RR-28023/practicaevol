@@ -130,7 +130,7 @@ def ejecutar_algoritmo(n_iter, tam_pop, seed, filepath=None):
         padres = seleccionar_padres(poblacion, tam_pop, num_padres)
         poblacion =  recombinar_padres(poblacion, padres)
         poblacion = mutar_individuos(poblacion, padres)
-        poblacion, fit_mejor_sup = seleccionar_supervivientes_mod1(poblacion, tam_pop)
+        poblacion, fit_mejor_sup = seleccionar_supervivientes(poblacion, tam_pop)
         print("Fitness mejor superviviente en iteración {0}: {1}".format(i + 1,fit_mejor_sup))
         mejores_fit.append(fit_mejor_sup)
         if fit_mejor_sup == 0:
