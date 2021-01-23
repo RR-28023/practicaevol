@@ -1,9 +1,9 @@
 ---
 title: 'Entrega 2: Elaboración de horarios mediante algoritmos evolutivos'
-author: 'Juan Miguel Frau y Ramon Rotaeche' 
+author: "Juan Miguel Frau y Ramon Rotaeche"
 date: "https://github.com/RR-28023/practicaevol"
-output: 
-  pdf_document
+output:
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -25,13 +25,13 @@ El objetivo de esta entrega es implementar un algoritmo evolutivo para la elabor
 
 ## 1. Restricciones *hard* y *soft*
 
-Un comentario preliminar es que, aunque el enunciado hable de secundaria y bachillerato, algunas de nuestras restricciones contemplan escenarios que son probables en el ámbito universitario, pero improbables en un instituto. Por ejemplo, que una clase tenga un día libre en la semana. Pese a esto, hemos querido incorporarlas en el algoritmo para darle más flexibilidad y comprobar cómo se comporta cuando hay muchas horas libres. Por tanto, en adelante se ha de suponer que el algoritmo está pensado para cualquier tipo de centro educativo, incluyendo la universidad.
+Un comentario preliminar es que, aunque el enunciado hable de secundaria y bachillerato, algunas de nuestras restricciones contemplan escenarios que son probables en el ámbito universitario, pero improbables en un instituto, por ejemplo, que una clase tenga un día libre en la semana. Pese a esto, hemos querido incorporarlas en el algoritmo para darle más flexibilidad y comprobar cómo se comporta cuando hay muchas horas libres. Por tanto, en adelante se ha de suponer que el algoritmo está pensado para cualquier tipo de centro educativo, incluyendo la universidad.
 
 Las **restricciones *hard*** del algoritmo son las siguientes:
 
 1. **No se pueden asignar horas a un profesor fuera de su disponibilidad**. Por motivos de conciliación laboral esta restricción debe estar presente. La restricción se tiene en cuenta mediante la función de *fitness* y se computa comparando con un horario de disponibilidad que proporciona cada profesor. Estos horarios de disponibilidad forman parte de los *inputs*.
 
-1. **No se pueden asignar dos asignaturas a la vez a la misma clase**. Está restricción debe estar presente por razones obvias. La restricción se satisface implícitamente mediante el agoritmo de inicialización de los individuos, ya que en cada franja únicamente se asigna una única asignatura.
+1. **No se pueden asignar dos asignaturas a la vez a la misma clase**. Está restricción debe estar presente por razones obvias. La restricción se satisface implícitamente mediante el algoritmo de inicialización de los individuos, ya que en cada franja únicamente se asigna una única asignatura.
 
 1. **No se pueden asignar dos clases a la vez al mismo profesor**. Está restricción debe estar presente por razones obvias, y se tiene en cuenta mediante la función de *fitness*.
 
@@ -64,20 +64,20 @@ Los *inputs* se introducen en el archivo en excel (*Generador inputs horarios.xl
 
 El archivo se divide en 4 secciones. En la sección 0 se introducen los nombres (los *labels*) de los profesores, las clases y las asignaturas. Al hacer esto se introduce implícitamente el número de total de profesores, clases y asignaturas. Además en esta sección se computan algunos daots agregados para comprobar que no hay incopatibilidades (por ejemplo, que a un profesor se le han asignado más horas de las que tiene disponibles)
 
-![Generador inputs horarios: Sección 0](imagenes/inputs_seccion_0)
+![Generador inputs horarios: Sección 0](imagenes/inputs_seccion_0.JPG)
 
 En la sección 1 se introduce, para cada clase, el número de horas semanales por asignatura (si una clase no tiene una asignatura, se asigna un 0) y el profesor que la imparte. Se supone una duración de una hora para todas las asignaturas (por lo que el número de horas tiene que ser un entero).
 
-![Generador inputs horarios: Sección 1](imagenes/inputs_seccion_1)
+![Generador inputs horarios: Sección 1](imagenes/inputs_seccion_1.JPG)
 
 En la sección 2 se introduce la disponibilidad de los profesores a lo largo de la semana. Para reducir los grados de libertad, se introduce a nivel día (en lugar de a nivel hora). Es decir, si los profesores están disponibles un día, lo están a cualquier hora del horario lectivo de ese día. Y viceversa, si no están disponibles, no lo están para ninguna hora de ese día.
 \newpage
 
-![Generador inputs horarios: Sección 2](imagenes/inputs_seccion_2)
+![Generador inputs horarios: Sección 2](imagenes/inputs_seccion_2.JPG)
 
-En la sección 3 se introduce el horario lectivo. Es decir, la hora a la que empiezan y acaban las clases cada día d ela semana. Para simplificar la implementación y dado que no cambiaría nada en relación a la técnica de resolución empleada, no se han tenido en cuenta recreos.
+En la sección 3 se introduce el horario lectivo. Es decir, la hora a la que empiezan y acaban las clases cada día de la semana. Para simplificar la implementación y dado que no cambiaría nada en relación a la técnica de resolución empleada, no se han tenido en cuenta recreos.
 
-![Generador inputs horarios: Sección 3](imagenes/inputs_seccion_3)
+![Generador inputs horarios: Sección 3](imagenes/inputs_seccion_3.JPG)
 
 ### 2.2 Codificación de la información de entrada
 
@@ -123,15 +123,15 @@ En *python* cada individuo se crea como una instancia de la clase *Genotipo*. Al
 
 ### 2.5 Función de fitness
 
-La función de fitness comprueba el cumplimiento de las restricciónes que no satisfechas implícitamente. En concreto, las restricciones *hard* 1,3 y 6 y todas las *soft*.
+La función de fitness comprueba el cumplimiento de las restricciones que no se satisfacen implícitamente en la codificación del genotipo. En concreto, las restricciones *hard* 1,3 y 6 y todas las *soft*.
 
 Para ello, emplea dos contadores, contador_hard y contador_soft. Cada violación de una restricción incrementa el contador respectivo. El *fitness* final del individuo será la suma de ambos contadores multiplicados por unos pesos que reflejan que las restricciones hard tienen una importancia superior que las soft. En concreto, el multiplicador vale 50 para las restricciones *hard* y 1 para las *soft*.
 
-Estamos por tanto ante un **valor de *fitness* que es menor cuanto mejor es la solución** (una solución óptima tendrá *fitness* = 0). Ésta no es la interpretación habitual del concepto de valor de *fitness*, que suele ser mayor cuanto mejor sea la solución. Sin embargo, en nuestro caso nos parecía más conveniente hacerlo de así porque de esta manera el valor de *fitness* óptimo está acotado (sabemos que no puede ser inferior a cero) y resulta más sencillo hacerse una idea intutivia de lo buena que es una solución mirando cómo de cerca está una solución de dicho óptimo "teórico" (decimos "teórico" entre comillas porque en realidad, para unos *inputs* determinados, puede que no sea posible encontrar una solución con *fitness* = 0).
+Estamos por tanto ante un **valor de *fitness* que es menor cuanto mejor es la solución** (una solución óptima tendrá *fitness* = 0). Esta no es la interpretación habitual del concepto de valor de *fitness*, que suele ser mayor cuanto mejor sea la solución. Sin embargo, en nuestro caso nos parecía más conveniente hacerlo así porque de esta manera el valor de *fitness* óptimo está acotado (sabemos que no puede ser inferior a cero) y resulta más sencillo hacerse una idea intutivia de lo buena que es una solución mirando cómo de cerca está una solución de dicho óptimo "teórico" (decimos "teórico" entre comillas porque en realidad, para unos *inputs* determinados, puede que no sea posible encontrar una solución con *fitness* = 0).
 
 ### 2.6 Selección de padres
 
-Para realizar la selección de padres se emplea el método de selección por torneo. Para ello, se divide la población en *n* grupos aleatorios. De cada grupo, se como padre el individuo que tiene menor valor de fitness.
+Para realizar la selección de padres se emplea el método de selección por torneo. Para ello, se divide la población en *n* grupos aleatorios y, de cada grupo, se elige como padre el individuo que tiene menor valor de fitness.
 
 El número de grupos *n* es el número de padres que se seleccionan. El algoritmo compúta el número de padres (*num_padres*) como un quinto de la población total (*n = num_padres = int(tam_población/5)*).
 
@@ -143,7 +143,7 @@ Por ejemplo, si hay cuatro clases ('Clase A', 'Clase B', Clase C' y 'Clase D'). 
 
 ### 2.8 Mutación
 
-La mutación consiste en permutar dos franjas horarias del horario. Sin embargo, debido a las restricciones realizadas y la codificación inicial especificada, no será posible permutar a nivel de genotipo, sino que se realizará en una de las clases para evitar que una clase tenga una asignatura que no le pertenece. Por ello, en primer lugar, se selecciona una clase de forma aleatoria y, seguidamente, se seleccionan aleatoriamente dos franjas del horario de dicha clase se intercambian la posición.
+La mutación consiste en permutar dos franjas horarias del horario. Sin embargo, debido a las restricciones realizadas y la codificación inicial especificada, no será posible permutar a nivel de genotipo, sino que se realizará en una de las clases para evitar que una clase tenga una asignatura que no le pertenece. Por ello, en primer lugar, se selecciona una clase de forma aleatoria y, seguidamente, se seleccionan aleatoriamente dos franjas del horario de dicha clase y se intercambian la posición.
 
 ### 2.9 Selección de supervivientes
 
@@ -156,7 +156,7 @@ La ejecución del algoritmo, implementado en *python* mediante la función *ejec
 
 El algoritmo se estructura de la siguiente manera:
 
-1. Se cálcula el número de padres (*n_padres*) como *num_padres = int(tam_población/5)*.
+1. Se calcula el número de padres (*n_padres*) como *num_padres = int(tam_población/5)*.
 2. Se extrae la información del excel y se codifican los inputs como se describe en la sección 2.2.
 3. Se inicializa la población como se describe en la sección 2.3 (la función de inicialización toma como parámetros los inputs codificados y la variable *tam_pop*), devolviendo una lista de objetos conteniendo todos los individuos pertenecientes a la población.
 4. Para cada iteración:
@@ -169,15 +169,17 @@ El algoritmo se estructura de la siguiente manera:
 
 Una vez ejecutado, el algoritmo ofrece (ver siguiente sección para ejemplos concretos):
 
-- Un gráfico con el fitness del mejor superviviento de cada iteración para poder seguir el proceso.
+- Un gráfico con el fitness del mejor superviviente de cada iteración para poder seguir el proceso.
 - Número de veces que la solucón final infringe cada una de las restricciones tanto hard como soft.
-- Dos representaciones gráficas de la solución, la primera muestra el horario desde el punto de vista de las clases y la segunda muestra el horario desde el punto de vista de los profesores, indicando los días en los que no están disponibles e indicando si hay algún solape. Esto se muestra para el mejor individuo en la iteración 1, y para el mejor individuo en la última iteración (es decir, la solución final) 
+- Dos representaciones gráficas de la solución, la primera muestra el horario desde el punto de vista de las clases y la segunda muestra el horario desde el punto de vista de los profesores, indicando los días en los que no están disponibles e indicando si hay algún solapamiento. Esto se muestra para el mejor individuo en la iteración 1, y para el mejor individuo en la última iteración (es decir, la solución final).
 
 ## 3. Pruebas realizadas
 
-Para testear el algoritmo se han utilizado diferentes entradas las cuales se ha ido incrementando en cada una de ellas su dificultad para el algoritmo. Dichas pruebas se han llevado a cabo con un tamaño de la población igual a 500 individuos y con un total de 1000 iteraciones.
+Para testear el algoritmo se han utilizado diferentes entradas las cuales se han ido incrementando en cada una de ellas su dificultad para el algoritmo. Dichas pruebas se han llevado a cabo con un tamaño de la población igual a 500 individuos y con un máximo de 1000 iteraciones.
 
-Finalmente, añadir que estos son solo algunas de las entradas creadas dentro de la gran posibilidad de entardas que existen, por ello, destacar que un pequeño cambio en este conjunto de datos de entrada puede conllevar grandes cambios en el algoritmo, y consecuentemente resultados totalmente diferentes.
+Añadir que estos son solo algunas de las entradas creadas dentro de la gran posibilidad de entradas que existen, por ello, destacar que un pequeño cambio en este conjunto de datos de entrada puede conllevar grandes cambios en el algoritmo, y consecuentemente resultados totalmente diferentes.
+
+Finalmente, mencionar que todos los gráficos e imágenes obtenidas para cada una de las entradas se muestren o no en las siguientes secciones se pueden encontrar en los archivos de código adjuntados.
 
 ### 3.1 Entrada 1
 
@@ -189,29 +191,47 @@ El primer conjunto de inputs utilizado está compuesto por:
 * Todos los profesores están disponibles todos los días
 * El horario lectivo es de 8h a 14h toda la semana
 
-El resultado obtenido es de un valor de fitness de 5. En este caso, no se ha infringido ninguna restricción hard pero si han infringido algunas restricicones soft, X veces la restrccion soft X y X veces la restriccion soft X, propiciando el valor de fitness obtenido.
+El resultado obtenido es de un valor de fitness de 5. En este caso, no se ha infringido ninguna restricción hard pero si han infringido algunas restricicones soft, 4 veces la restricción soft 2 y 1 vez la restricción soft 4, propiciando el valor de fitness obtenido.
 
-En cuanto a la gráfica (imagen X), se puede apreciar en las primeras iteraciones un descenso rápido en el valor de fitness que se va atenuando siendo más constante a medida que avanzan las iteraciones.
+En cuanto a la siguiente gráfica (Figura 5), se puede apreciar en las primeras iteraciones un descenso rápido en el valor de fitness que se va atenuando siendo más constante a medida que avanzan las iteraciones.
+\newpage
 
-En cuanto a la comparativa entre el mejor individuo de la población inicial y el indivudo final (imagen x), se puede ver como han desaparecido los huecos sin clase y se han eliminado en mayor parte la repetición de una misma asignatura el mismo día.
+![Entrada 1. Gráfico relación iteraciones y valor de fitness.](imagenes/entrada1_plot_iteraciones.png)
 
-Sobre la imagen X que compara los horarios de los profesores entre el mejor individuo de la población inicial y el indivudo final, ver como se ha conseguido evitar el solapamiento, se ha conseguido que el profesor dé todas sus clases de forma seguida y que el número de horas de clase sea uniforme durante todos los días de la semana.
+En cuanto a la comparativa entre el mejor individuo de la población inicial y el indivudo final, se puede ver como han desaparecido los huecos sin clase y se han eliminado en mayor parte la repetición de una misma asignatura el mismo día.
+\newpage
 
-FALTA PONER IMÁGENES Y RESULTADOS
+![Entrada 1. Horarios clases del mejor individuo primera iteración.](imagenes/entrada1_plot_inicial_clases.png)
+
+![Entrada 1. Horarios clases del individuo solución.](imagenes/entrada1_plot_final_clases.png)
+
+Y sobre la comparativa de los horarios de los profesores entre el mejor individuo de la población inicial y el individuo final, ver como se ha conseguido evitar el solapamiento, se ha conseguido que el profesor dé todas sus clases de forma seguida y que el número de horas de clase sea uniforme durante todos los días de la semana.
+\newpage
+
+![Entrada 1. Horarios profesores del mejor individuo primera iteración.](imagenes/entrada1_plot_inicial_profes.png)
+\newpage
+![Entrada 1. Horarios profesores del individuo solución.](imagenes/entrada1_plot_final_profes.png)
 
 ### 3.2 Entrada 2
 
 El segundo conjunto de inputs utilizado es prácticamente igual al anterior con la única diferencia de que en este caso los profesores no tienen un disponibilidad horaria completo por lo que habrá días en los que no podrán ejercer.
 
-El resultado obtenido ha sido de un valor de fitness de X. En este caso, no se ha infringido ninguna restricción hard pero si han infringido algunas restricicones soft, X veces la restrccion soft X y X veces la restriccion soft X, propiciando el valor de fitness obtenido.
+El resultado obtenido ha sido de un valor de fitness de 15. En este caso, no se ha infringido ninguna restricción hard pero si han infringido algunas restricicones soft como son las restricciones 1, 2, 4 y 5 un total de 2, 4, 5 y 4 veces respectivamente.
 
-Ver en las imágenes X y X como, además de todas las mejoras vistas en la entrada anterior respecto al primer indiduo y el individuo final, también se puede apreciar como los días marcados en verde, los cuales indican que el profesor no tiene disponibilidad, no se han asignado ninguna hora de clase ese día. 
+Ver en las siguientes imágenes de los horarios iniciales y finales de clases y profesores como, además de todas las mejoras vistas en la entrada anterior respecto al primer indiduo y el individuo final, también se puede apreciar como los días marcados en verde, los cuales indican que el profesor no tiene disponibilidad, no se han asignado ninguna hora de clase ese día. 
+\newpage
 
-FALTA PONER IMÁGENES Y RESULTADOS
+![Entrada 2. Horarios clases del mejor individuo primera iteración](imagenes/entrada2_plot_inicial_clases.png)
+\newpage
+![Entrada 2. Horarios clases del individuo solución.](imagenes/entrada2_plot_final_clases.png)
+\newpage
+![Entrada 2. Horarios profesores del mejor individuo primera iteración.](imagenes/entrada2_plot_inicial_profes.png)
+
+![Entrada 2. Horarios profesores del individuo solución.](imagenes/entrada2_plot_final_profes.png)
 
 ### 3.3 Entrada 3
 
-El tercer conjunto de inputs utilizado está compuesto por:
+El tercer conjunto de inputs utilizado va destinado a asignar muchas horas a cada uno de los profesores para poder visualizar las restricciones propias de los profesores. Este conjunto de entrada está compuesto por:
 
 * 5 profesores que pueden dar diferentes asignaturas a diferentes clases
 * 4 grupos de clase con el mismo número de horas de clase cada uno
@@ -219,11 +239,13 @@ El tercer conjunto de inputs utilizado está compuesto por:
 * Los profesores hay días en los que no tienen disponibilidad
 * El horario lectivo es de 8h a 14h toda la semana
 
-El valor de fitness obtenido ha sido de X. Este caso, no ha tenido ninguna violación de las restricciones hard pero si alguna de las restricciones soft.
+El valor de fitness obtenido ha sido de 21. Las restricciones infringidas, únicamente soft, han sido la restricción 1 solo 1 vez, la restricción 2 un total de 2 veces, la restricción 4 un total de 10 veces y la restricción 5 un total de 8 veces. 
 
-Además, indicar, tal como se ve en la imagen X, como al ser menos profesores que la entradas anteriores se ha tenido que ajustar en gran medida los horarios de los profesores pero siempre respetando los dias que no tienen disponibilidad.
+Además, indicar, tal como se ve en la figura 13, como al ser menos profesores que la entradas anteriores se ha tenido que ajustar en gran medida los horarios de los profesores pero siempre respetando los dias que no tienen disponibilidad.
 
-FALTA PONER IMÁGENES Y RESULTADOS
+![Entrada 3. Horarios profesores del mejor individuo primera iteración.](imagenes/entrada3_plot_inicial_profes.png)
+
+![Entrada 3. Horarios profesores del individuo solución.](imagenes/entrada3_plot_final_profes.png)
 
 ### 3.4 Entrada 4
 
@@ -235,7 +257,18 @@ El cuarto conjunto de inputs utilizado está compuesto por:
 * Los profesores hay días en los que no tienen disponibilidad
 * El horario lectivo es de 8-14h el lunes, de 8-15h los martes, miércoles y jueves y de 8-13h los viernes
 
-FALTA PONER IMÁGENES Y RESULTADOS
+El valor de fitness obtenido ha sido 31 y se han infrigindo todas las restricciones del tipo soft un total de 1, 6, 2, 11 y 11 veces en dicho orden.Y pudiéndose ver la recombinación de las diferentes clases según el número de horas que se imparten en cada una de ellas.
+
+![Entrada 4. Gráfico relación iteraciones y valor de fitness.](imagenes/entrada4_plot_iteraciones.png)
+
+![Entrada 4. Horarios clases del mejor individuo primera iteración](imagenes/entrada4_plot_inicial_clases.png)
+
+![Entrada 4. Horarios clases del individuo solución.](imagenes/entrada4_plot_final_clases.png)
+
+![Entrada 4. Horarios profesores del mejor individuo primera iteración.](imagenes/entrada4_plot_inicial_profes.png)
+
+![Entrada 4. Horarios profesores del individuo solución.](imagenes/entrada4_plot_final_profes.png)
+
 
 ## 4. Modificaciones del algoritmo
 

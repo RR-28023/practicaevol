@@ -32,8 +32,10 @@ def seleccionar_supervivientes(poblacion, tam_pop):
     return supervivientes, fitness_mejor_superviviente
 
 def seleccionar_supervivientes_mod1(poblacion, tam_pop):
-    #Otra posible propuesta de método de selección.
-    #Selección totalmente aleatoria
+    '''
+    Otra posible propuesta de método de selección.
+    Selección totalmente aleatoria
+    '''
     supervivientes = np.random.choice(poblacion, tam_pop, replace=False)
     supervivientes = supervivientes.tolist()
     fitness_mejor_superviviente = sorted(supervivientes, key=operator.attrgetter('fitness'), reverse=False)[0].fitness
@@ -57,9 +59,9 @@ def seleccionar_supervivientes_mod2(poblacion, tam_pop):
     ruleta_resultados = np.concatenate((ruleta[posicion_inicio:len(ruleta)], ruleta[0:posicion_inicio]), axis=0)
     num_individuos_elegir = int(len(ruleta)/tam_pop)
     supervivientes = []
-    for i in range(0,len(ruleta),num_individuos_elegir):
-        if len(supervivientes)<tam_pop:
-            supervivientes.append(poblacion_ordenada[ruleta[i]])
+    for i in range(0, len(ruleta_resultados), num_individuos_elegir):
+        if len(supervivientes) < tam_pop:
+            supervivientes.append(poblacion_ordenada[ruleta_resultados[i]])
 
     fitness_mejor_superviviente = sorted(supervivientes, key=operator.attrgetter('fitness'), reverse=False)[0].fitness
     return supervivientes, fitness_mejor_superviviente
@@ -157,5 +159,4 @@ if __name__ == '__main__':
 
     for archivo in archivos:
         ejecutar_algoritmo(n_iter=1000, tam_pop=500, seed=42, filepath=archivo)
-
 
