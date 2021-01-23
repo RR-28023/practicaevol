@@ -32,8 +32,10 @@ def seleccionar_supervivientes(poblacion, tam_pop):
     return supervivientes, fitness_mejor_superviviente
 
 def seleccionar_supervivientes_mod1(poblacion, tam_pop):
-    #Otra posible propuesta de método de selección.
-    #Selección totalmente aleatoria
+    '''
+    Otra posible propuesta de método de selección.
+    Selección totalmente aleatoria
+    '''
     supervivientes = np.random.choice(poblacion, tam_pop, replace=False)
     supervivientes = supervivientes.tolist()
     fitness_mejor_superviviente = sorted(supervivientes, key=operator.attrgetter('fitness'), reverse=False)[0].fitness
@@ -57,9 +59,9 @@ def seleccionar_supervivientes_mod2(poblacion, tam_pop):
     ruleta_resultados = np.concatenate((ruleta[posicion_inicio:len(ruleta)], ruleta[0:posicion_inicio]), axis=0)
     num_individuos_elegir = int(len(ruleta)/tam_pop)
     supervivientes = []
-    for i in range(0,len(ruleta),num_individuos_elegir):
-        if len(supervivientes)<tam_pop:
-            supervivientes.append(poblacion_ordenada[ruleta[i]])
+    for i in range(0, len(ruleta_resultados), num_individuos_elegir):
+        if len(supervivientes) < tam_pop:
+            supervivientes.append(poblacion_ordenada[ruleta_resultados[i]])
 
     fitness_mejor_superviviente = sorted(supervivientes, key=operator.attrgetter('fitness'), reverse=False)[0].fitness
     return supervivientes, fitness_mejor_superviviente
@@ -79,25 +81,21 @@ def seleccionar_padres(poblacion,tam_pop, num_padres):
 
     return padres_seleccionados
 
-def recombinar_padres(poblacion, padres, n_iteracion):
+def recombinar_padres(poblacion, padres):
     nueva_poblacion = poblacion
     n_padres = len(padres)
     padres_shuffled = random.sample(padres, n_padres)
     mitad = int(n_padres/2)
     for padre1, padre2 in zip(padres_shuffled[0:mitad],padres_shuffled[mitad:n_padres]):
-        if n_iteracion % 2 == 0:
-            nueva_poblacion.extend((recombinar_genotipos(padre1, padre2)))
-        else:
-            nueva_poblacion.extend((recombinar_genotipos_mod4(padre1, padre2)))
+        nueva_poblacion.extend((recombinar_genotipos(padre1, padre2)))
+
     return nueva_poblacion
 
-def mutar_individuos(poblacion, padres, n_iteracion):
+def mutar_individuos(poblacion, padres):
     nueva_poblacion = poblacion
     for padre in padres:
-        if n_iteracion % 2 == 0:
-            nueva_poblacion.append(mutar_genotipo(padre))
-        else:
-            nueva_poblacion.append(mutar_genotipo_mod5(padre))
+        nueva_poblacion.append(mutar_genotipo(padre))
+
     return nueva_poblacion
 
 def seleccionar_solucion(poblacion):
@@ -132,8 +130,8 @@ def ejecutar_algoritmo(n_iter, tam_pop, seed, filepath=None):
             mejor_individuo_inicial.plot_horario_profesores()
 
         padres = seleccionar_padres(poblacion, tam_pop, num_padres)
-        poblacion =  recombinar_padres(poblacion, padres, i)
-        poblacion = mutar_individuos(poblacion, padres, i)
+        poblacion = recombinar_padres(poblacion, padres)
+        poblacion = mutar_individuos(poblacion, padres)
         poblacion, fit_mejor_sup = seleccionar_supervivientes(poblacion, tam_pop)
         print("Fitness mejor superviviente en iteración {0}: {1}".format(i + 1,fit_mejor_sup))
         mejores_fit.append(fit_mejor_sup)
