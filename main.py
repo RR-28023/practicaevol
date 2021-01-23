@@ -85,7 +85,7 @@ def recombinar_padres(poblacion, padres, n_iteracion):
     padres_shuffled = random.sample(padres, n_padres)
     mitad = int(n_padres/2)
     for padre1, padre2 in zip(padres_shuffled[0:mitad],padres_shuffled[mitad:n_padres]):
-        if n_iteracion % 2 == 0:
+        if True: #n_iteracion % 2 == 0:
             nueva_poblacion.extend((recombinar_genotipos(padre1, padre2)))
         else:
             nueva_poblacion.extend((recombinar_genotipos_mod4(padre1, padre2)))
@@ -94,7 +94,7 @@ def recombinar_padres(poblacion, padres, n_iteracion):
 def mutar_individuos(poblacion, padres, n_iteracion):
     nueva_poblacion = poblacion
     for padre in padres:
-        if n_iteracion % 2 == 0:
+        if True: #n_iteracion % 2 == 0:
             nueva_poblacion.append(mutar_genotipo(padre))
         else:
             nueva_poblacion.append(mutar_genotipo_mod5(padre))
@@ -157,4 +157,5 @@ if __name__ == '__main__':
 
     for archivo in archivos:
         ejecutar_algoritmo(n_iter=1000, tam_pop=500, seed=42, filepath=archivo)
+
 
