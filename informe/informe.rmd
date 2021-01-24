@@ -74,7 +74,6 @@ En la sección 1 se introduce, para cada clase, el número de horas semanales po
 ![Generador inputs horarios: Sección 1](imagenes/inputs_seccion_1.JPG)
 
 En la sección 2 se introduce la disponibilidad de los profesores a lo largo de la semana. Para reducir los grados de libertad, se introduce a nivel día (en lugar de a nivel hora). Es decir, si los profesores están disponibles un día, lo están a cualquier hora del horario lectivo de ese día. Y viceversa, si no están disponibles, no lo están para ninguna hora de ese día.
-\newpage
 
 ![Generador inputs horarios: Sección 2](imagenes/inputs_seccion_2.JPG)
 
@@ -214,22 +213,19 @@ En cuanto a la siguiente gráfica (Figura 5), se puede apreciar en las primeras 
 
 En cuanto a la comparativa entre el mejor individuo de la población inicial y el individuo final, se puede ver como han desaparecido los huecos sin clase y se han eliminado en mayor parte la repetición de una misma asignatura el mismo día.
 
-\newpage
-
-![Entrada 1. Horarios clases del mejor individuo primera iteración.](imagenes/entrada1_plot_inicial_clases.png){width=85%}
-
-![Entrada 1. Horarios clases del individuo solución.](imagenes/entrada1_plot_final_clases.png){width=85%}
+![Entrada 1. Horarios clases del mejor individuo primera iteración.](imagenes/entrada1_plot_inicial_clases.png)
 
 \newpage
+
+![Entrada 1. Horarios clases del individuo solución.](imagenes/entrada1_plot_final_clases.png)
 
 Y sobre la comparativa de los horarios de los profesores entre el mejor individuo de la población inicial y el individuo final, ver como se ha conseguido evitar el solapamiento, se ha conseguido que el profesor dé todas sus clases de forma seguida y que el número de horas de clase sea uniforme durante todos los días de la semana.
 
 ![Entrada 1. Horarios profesores del mejor individuo primera iteración. Rojo indica solapamiento de asignaturas](imagenes/entrada1_plot_inicial_profes.png)
 
-\newpage
-
 ![Entrada 1. Horarios profesores del individuo solución.](imagenes/entrada1_plot_final_profes.png)
 
+\newpage
 
 ### 3.2 Entrada 2
 
@@ -310,7 +306,7 @@ En esta sección proponemos una serie de potenciales mejoras para el algoritmo, 
 
 Se proponen dos nuevas técnicas de selección de supervivientes:
 
--**Modificación 1**: Selección totalmente aleatoria donde no se tiene en cuenta el valor de fitness. Es importante destacar que esto no elimina completamente la convergencia hacia una solución con mejor fitness, porque también está la selección de padres, que sigue estando sesgada hacia los individuos con mejor fitness.
+-**Modificación 1**: Selección totalmente aleatoria donde no se tiene en cuenta el valor de fitness. Es importante destacar que esta modificación no hace que la población deje de tender hacia individuos con mejor fitness a medida que se suceden las iteraciones. Esto es así porque aunque con esta modificación la selección de supervivientes es aleatoria, la selección de padres sigue estando sesgada hacia los individuos con mejor fitness. Y como los padres son los que se combinan y los que mutan, cuando toca seleccionar supervivientes, hay una sobre representación de individuos parecidos a los padres, que tienen mejor fitness que la media de la población.
 
 -**Modificación 2**: Técnica de selección del muestreo universal estocástico (SUS) desarrollado por James Baker. Esta técnica es similar a la técnica de selección de la ruleta empleada en el algoritmo original. Ambas técnicas utilizan los valores de fitness para definir el tamaño de la "porción de la ruleta" que corresponde a cada individuo, de modo que es más probable escoger un individuo con un fitness mejor. Sin embargo, la diferencia que existe entre ambas técnicas es que la técnica de la ruleta realiza *n* tiradas obteniendo cada vez un individuo, mientras que la técnica SUS únicamente realiza una tirada para definir el punto de la ruleta a partir del cual "recorre" la ruleta en intervalos uniformes seleccionando un individuo en cada intervalo. 
 
@@ -332,15 +328,15 @@ A continuación se muestra el fitness resultante de aplicar cada modificación a
 
 ![Fitness de la solución final obtenida tras aplicar las diferentes modificaciones, seed 42](imagenes/comparativa_mod_seed42.png)
 
-Como se puede observar, no hay ninguna modificación que consistentemente supere al algoritmo oiriginal. De hecho el algoritmo original acaba en segunda posición, sólo superado por la modificación que selecciona supervivientes de forma aleatoria. La razón por la que esta modificación funciona puede tener que ver con el motivo que nos llevó a incluirla, y es que observábamos que a partir de cierto número de iteraciones, todos los individuos de la población eran idénticos o muy parecidos. Nuestra interpretación es que esta "tendencia a la endogamia" hace que las soluciones converjan hacia un mínimo local relativamente cercano a la población inicial, impidiendo que se exploren otras zonas del espacio de soluciones que puede que contengan mejores mínimos. 
+Como se puede observar, no hay ninguna modificación que consistentemente supere al algoritmo original. De hecho el algoritmo original acaba en segunda posición, sólo superado por la modificación que selecciona supervivientes de forma aleatoria. La razón por la que esta modificación funciona puede tener que ver con el motivo que nos llevó a incluirla, y es que observábamos que a partir de cierto número de iteraciones, todos los individuos de la población eran idénticos o muy parecidos. Nuestra interpretación es que esta "tendencia a la endogamia" hace que las soluciones converjan hacia un mínimo local relativamente cercano a la población inicial, impidiendo que se exploren otras zonas del espacio de soluciones que puede que contengan mejores mínimos. Una selección aleatoria de individuos hace que esta convergencia hacia mínimos locales sea más lenta, permitiendo explorar otras zonas del espacio de soluciones que, como se ve en los resultados, resultan en un *fitness* mejor.
 
-Una pregunta interesante es cómo de dependientes son estos resultados de la población inicial generada de forma aleatoria. Si realizamos  el mismo análisis pero con otra *seed*, obtenemos los siguientes resultados.
+Una pregunta interesante es cómo de dependientes son estos resultados de la población inicial generada de forma aleatoria. Si realizamos el mismo análisis pero con otra *seed*, obtenemos los siguientes resultados.
 
 \newpage
 
 ![Fitness de la solución final obtenida tras aplicar las diferentes modificaciones, seed 33](imagenes/comparativa_mod_seed33.png)
 
-Se puede observar como la modificación 2 sigue siendo la que mejor resultados dá. Aunque en este caso la modificación 3 también supera al algorimto original.
+Se puede observar como la modificación 2 sigue siendo la que mejor resultados da. Aunque en este caso la modificación 3 también supera al algoritmo original.
 
 
 
