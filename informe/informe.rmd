@@ -74,7 +74,6 @@ En la sección 1 se introduce, para cada clase, el número de horas semanales po
 ![Generador inputs horarios: Sección 1](imagenes/inputs_seccion_1.JPG)
 
 En la sección 2 se introduce la disponibilidad de los profesores a lo largo de la semana. Para reducir los grados de libertad, se introduce a nivel día (en lugar de a nivel hora). Es decir, si los profesores están disponibles un día, lo están a cualquier hora del horario lectivo de ese día. Y viceversa, si no están disponibles, no lo están para ninguna hora de ese día.
-\newpage
 
 ![Generador inputs horarios: Sección 2](imagenes/inputs_seccion_2.JPG)
 
@@ -214,22 +213,19 @@ En cuanto a la siguiente gráfica (Figura 5), se puede apreciar en las primeras 
 
 En cuanto a la comparativa entre el mejor individuo de la población inicial y el individuo final, se puede ver como han desaparecido los huecos sin clase y se han eliminado en mayor parte la repetición de una misma asignatura el mismo día.
 
-\newpage
-
-![Entrada 1. Horarios clases del mejor individuo primera iteración.](imagenes/entrada1_plot_inicial_clases.png){width=85%}
-
-![Entrada 1. Horarios clases del individuo solución.](imagenes/entrada1_plot_final_clases.png){width=85%}
+![Entrada 1. Horarios clases del mejor individuo primera iteración.](imagenes/entrada1_plot_inicial_clases.png)
 
 \newpage
+
+![Entrada 1. Horarios clases del individuo solución.](imagenes/entrada1_plot_final_clases.png)
 
 Y sobre la comparativa de los horarios de los profesores entre el mejor individuo de la población inicial y el individuo final, ver como se ha conseguido evitar el solapamiento, se ha conseguido que el profesor dé todas sus clases de forma seguida y que el número de horas de clase sea uniforme durante todos los días de la semana.
 
 ![Entrada 1. Horarios profesores del mejor individuo primera iteración. Rojo indica solapamiento de asignaturas](imagenes/entrada1_plot_inicial_profes.png)
 
-\newpage
-
 ![Entrada 1. Horarios profesores del individuo solución.](imagenes/entrada1_plot_final_profes.png)
 
+\newpage
 
 ### 3.2 Entrada 2
 
