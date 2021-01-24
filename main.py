@@ -88,14 +88,12 @@ def recombinar_padres(poblacion, padres):
     mitad = int(n_padres/2)
     for padre1, padre2 in zip(padres_shuffled[0:mitad],padres_shuffled[mitad:n_padres]):
         nueva_poblacion.extend((recombinar_genotipos(padre1, padre2)))
-
     return nueva_poblacion
 
 def mutar_individuos(poblacion, padres):
     nueva_poblacion = poblacion
     for padre in padres:
         nueva_poblacion.append(mutar_genotipo(padre))
-
     return nueva_poblacion
 
 def seleccionar_solucion(poblacion):
@@ -130,7 +128,7 @@ def ejecutar_algoritmo(n_iter, tam_pop, seed, filepath=None):
             mejor_individuo_inicial.plot_horario_profesores()
 
         padres = seleccionar_padres(poblacion, tam_pop, num_padres)
-        poblacion = recombinar_padres(poblacion, padres)
+        poblacion =  recombinar_padres(poblacion, padres)
         poblacion = mutar_individuos(poblacion, padres)
         poblacion, fit_mejor_sup = seleccionar_supervivientes(poblacion, tam_pop)
         print("Fitness mejor superviviente en iteración {0}: {1}".format(i + 1,fit_mejor_sup))
